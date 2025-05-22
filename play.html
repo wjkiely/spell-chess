@@ -591,7 +591,7 @@
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             
-            let filename = "Spell_chess_save.html"; 
+            let filename = "Spell_chess.html"; 
             if (gameState.moveLog.length > 0) {
                 const lastFullTurnEntryIndex = gameState.moveLog.length - 1;
                 let turnNumberForFile = gameState.moveLog[lastFullTurnEntryIndex].turn;
@@ -613,7 +613,7 @@
                     if(gameState.moveLog[i].turn < turnNumberForFile) break;
                 }
                 
-                filename = `Spell_chess_${turnNumberForFile}`;
+                filename = `${turnNumberForFile}`;
                 if (whiteMoveForFile) {
                     filename += whiteMoveForFile;
                 }
