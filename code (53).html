@@ -203,7 +203,7 @@
         }
         .white-piece-font {
             color: white;
-            text-shadow: 0 0 1px black, 0 0 1px black; /* Adjust for desired outline thickness */
+            text-shadow: 0 0 1px black, 0 0 1px black; 
         }
 
 
@@ -442,6 +442,7 @@
                     <small id="black-freeze-cooldown"></small>
                 </div>
                 
+                <button id="change-piece-style-button" class="reset-button">Use Standard Pieces</button> 
                 <button id="download-game-button" class="reset-button">Download Game</button>
                 <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
                 <button id="reset-game-button" class="reset-button">Reset Game</button>
@@ -490,23 +491,16 @@
     </script>
 
     <script id="spell-chess-game-script">
-        const PIECES = {
-            'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', // White pieces use black symbols
-            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'  // Black
+        const MODERN_PIECES = { 
+            'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 
+            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
         };
-
-        const initialBoardSetup = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-        ];
-
-        let gameState;
+        const STANDARD_PIECES = {
+            'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',
+            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
+        };
+        
+        let gameState; // Will be initialized in resetGame or by loading saved data
         let initialGameDataFromSave = null;
 
         const chessboardDiv = document.getElementById('chessboard');
@@ -518,6 +512,7 @@
         const downloadGifButton = document.getElementById('download-gif-button');
         const prevMoveButton = document.getElementById('prev-move-button');
         const nextMoveButton = document.getElementById('next-move-button');
+        const changePieceStyleButton = document.getElementById('change-piece-style-button');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -525,7 +520,7 @@
             const target = {};
             for (const key in sourceState) {
                 if (Object.prototype.hasOwnProperty.call(sourceState, key)) {
-                    if (key === 'history' || key === 'moveLog' || key === 'viewingState') { 
+                    if (key === 'history' || key === 'moveLog') {  // Don't copy history into history snapshots
                         continue; 
                     }
                     const value = sourceState[key];
@@ -539,7 +534,7 @@
             return target;
         }
         
-        function deepCopyFullState(sourceState) {
+        function deepCopyFullState(sourceState) { // For saving/loading full game
             return JSON.parse(JSON.stringify(sourceState));
         }
 
@@ -570,9 +565,8 @@
                 isGameOver: false,
                 gameEndMessage: "", 
                 awaitingPromotion: null,
-                history: [],
-                browsingHistoryPly: -1, 
-                viewingState: null 
+                history: [], // Will store snapshots after each ply
+                useStandardPieceSymbols: false // Default style
             };
         }
 
@@ -594,10 +588,15 @@
         }
 
         function resetGame(forceNewGame = false) {
+            let previousUseStandardSymbols = gameState ? gameState.useStandardPieceSymbols : false; 
+
             if (!forceNewGame && initialGameDataFromSave) {
                 gameState = deepCopyFullState(initialGameDataFromSave); 
-                if(gameState.browsingHistoryPly === undefined) gameState.browsingHistoryPly = -1; 
-                if(gameState.viewingState === undefined) gameState.viewingState = null;
+                if(gameState.browsingHistoryPly !== undefined) gameState.browsingHistoryPly = -1; // Ensure browsing mode is off
+                // viewingState is not part of saved state, so it will be null
+                if (typeof initialGameDataFromSave.useStandardPieceSymbols === 'boolean') {
+                    previousUseStandardSymbols = initialGameDataFromSave.useStandardPieceSymbols;
+                }
                 initialGameDataFromSave = null; 
                 console.log("Game loaded from saved state.");
                 document.body.classList.remove('home-view');
@@ -606,9 +605,12 @@
                 initializeGameState();
                 initializeBoardState();
                 const initialSnapshot = deepCopyGameStateForSnapshot(gameState); 
-                gameState.history.push(initialSnapshot);
+                gameState.history.push(initialSnapshot); // Snapshot of ply 0
                 console.log("New game started.");
             }
+            gameState.useStandardPieceSymbols = previousUseStandardSymbols; 
+            changePieceStyleButton.textContent = gameState.useStandardPieceSymbols ? "Use Colored Pieces" : "Use Standard Pieces";
+
 
             promotionChoicesDiv.style.display = 'none';
 
@@ -618,36 +620,21 @@
             updateNotationDisplay();
             updateHistoryNavButtons();
 
-            if (gameState.isGameOver && gameState.browsingHistoryPly === -1) { 
-                updateStatus(gameState.gameEndMessage || "Game over.");
-            } else if (gameState.awaitingPromotion && gameState.browsingHistoryPly === -1) {
-                updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-            } else if (gameState.browsingHistoryPly !== -1 && gameState.viewingState) {
-                let statusMsg = `Viewing ply ${gameState.viewingState.plyCount}. `;
-                 if (gameState.viewingState.isGameOver) {
-                    statusMsg += gameState.viewingState.gameEndMessage;
-                } else {
-                    statusMsg += `${gameState.viewingState.currentPlayer.charAt(0).toUpperCase() + gameState.viewingState.currentPlayer.slice(1)} to play.`;
-                    if (isKingInCheck(gameState.viewingState.currentPlayer, gameState.viewingState.board, gameState.viewingState.enPassantTarget, gameState.viewingState.activeSpells, gameState.viewingState.plyCount)) {
-                         statusMsg += " Check!";
-                    }
-                }
-                updateStatus(statusMsg);
-            }
-             else {
-                let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                 if (gameState.board && gameState.board.length > 0 && 
-                    isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                    statusMsg += " Check!";
-                }
-                updateStatus(statusMsg);
-            }
+            updateStatusBasedOnCurrentGameState();
         }
+        
+        changePieceStyleButton.addEventListener('click', () => {
+            gameState.useStandardPieceSymbols = !gameState.useStandardPieceSymbols;
+            changePieceStyleButton.textContent = gameState.useStandardPieceSymbols ? "Use Colored Pieces" : "Use Standard Pieces";
+            renderBoard(); 
+        });
+
 
         document.getElementById('reset-game-button').addEventListener('click', () => resetGame(true)); 
         cancelButton.addEventListener('click', handleCancelAction); 
 
         promotionChoicesDiv.addEventListener('click', function(event) {
+            // ... (remains the same)
             if (event.target.classList.contains('promotion-button') && gameState.awaitingPromotion) {
                 const chosenPieceType = event.target.dataset.promote;
                 const { r, c, color, originalMoveNotation, movingPiece, fromR, fromC } = gameState.awaitingPromotion;
@@ -666,7 +653,8 @@
         });
 
         downloadGameButton.addEventListener('click', () => { 
-            if (gameState.awaitingPromotion) {
+            // ... (remains the same)
+             if (gameState.awaitingPromotion) {
                 alert("Cannot download game while awaiting pawn promotion.");
                 return;
             }
@@ -731,7 +719,8 @@
         });
 
         downloadGifButton.addEventListener('click', async () => {
-            if (gameState.awaitingPromotion) {
+            // ... (remains the same as previous correct version - downloading frames and opening ezgif)
+             if (gameState.awaitingPromotion) {
                 alert("Cannot generate GIF frames while awaiting pawn promotion.");
                 return;
             }
@@ -751,39 +740,88 @@
             const actualCurrentPlyCount = gameState.plyCount; 
             const actualBrowsingHistoryPly = gameState.browsingHistoryPly; 
             
-            const tempGameStateForRender = {}; 
+            const tempGameStateForRender = {}; // For temporarily holding parts of historical states
 
             try {
-                for (let i = 0; i < gameState.history.length; i++) {
+                for (let i = 0; i < gameState.history.length; i++) { // Iterate through ALL history including initial state
                     const historicalStateSnapshot = gameState.history[i];
                     
-                    for (const key in historicalStateSnapshot) {
-                        if (Object.prototype.hasOwnProperty.call(historicalStateSnapshot, key)) {
-                             if (typeof historicalStateSnapshot[key] === 'object' && historicalStateSnapshot[key] !== null) {
-                                tempGameStateForRender[key] = JSON.parse(JSON.stringify(historicalStateSnapshot[key]));
-                            } else {
-                                tempGameStateForRender[key] = historicalStateSnapshot[key];
+                    // Prepare a temporary state for rendering this frame without mutating live gameState
+                    let boardToRenderForFrame = JSON.parse(JSON.stringify(historicalStateSnapshot.board));
+                    let activeSpellsForFrame = JSON.parse(JSON.stringify(historicalStateSnapshot.activeSpells || []));
+                    let plyCountForFrame = historicalStateSnapshot.plyCount;
+
+                    // Create a temporary board for rendering purposes
+                    const tempBoardForRendering = document.createElement('div');
+                    tempBoardForRendering.id = 'temp-chessboard-for-gif'; // Unique ID
+                    tempBoardForRendering.className = 'chessboard'; // Apply same styles
+                    // Populate tempBoardForRendering based on boardToRenderForFrame, activeSpellsForFrame, plyCountForFrame
+                    // This is a simplified renderBoard for the temporary div
+                    tempBoardForRendering.innerHTML = ''; // Clear previous
+                     boardToRenderForFrame.forEach((row, r_idx) => {
+                        row.forEach((piece, c_idx) => {
+                            const square = document.createElement('div');
+                            square.classList.add('square');
+                            square.classList.add((r_idx + c_idx) % 2 === 0 ? 'light' : 'dark');
+                            
+                            if (isSquareUnderActiveFreeze(r_idx, c_idx, activeSpellsForFrame, plyCountForFrame)) {
+                                square.classList.add('active-freeze-zone');
+                                const freezeEmojiSpan = document.createElement('span');
+                                freezeEmojiSpan.classList.add('square-freeze-emoji');
+                                freezeEmojiSpan.textContent = '❄️';
+                                square.appendChild(freezeEmojiSpan);
+                            } else if (piece && piece.isJumpable) { // Check for jumpable in historical state
+                                square.classList.add('jumpable-on-square');
                             }
-                        }
-                    }
-                    
-                    gameState.board = tempGameStateForRender.board; 
-                    gameState.activeSpells = tempGameStateForRender.activeSpells || []; 
-                    gameState.plyCount = tempGameStateForRender.plyCount; 
-                    gameState.selectedPiece = null; 
-                    renderBoard(); 
+                            // Render freeze outlines for this frame
+                            activeSpellsForFrame.forEach(spell => {
+                                if (spell.type === 'freeze' && plyCountForFrame < spell.expiresAtPly) {
+                                    const spellCenterR = spell.targetSquare.r;
+                                    const spellCenterC = spell.targetSquare.c;
+                                    const minEffectR = Math.max(0, spellCenterR - 1);
+                                    const maxEffectR = Math.min(7, spellCenterR + 1);
+                                    const minEffectC = Math.max(0, spellCenterC - 1);
+                                    const maxEffectC = Math.min(7, spellCenterC + 1);
+                                    if (r_idx >= minEffectR && r_idx <= maxEffectR && c_idx >= minEffectC && c_idx <= maxEffectC) {
+                                        if (r_idx === minEffectR) square.classList.add('freeze-outline-top');
+                                        if (r_idx === maxEffectR) square.classList.add('freeze-outline-bottom');
+                                        if (c_idx === minEffectC) square.classList.add('freeze-outline-left');
+                                        if (c_idx === maxEffectC) square.classList.add('freeze-outline-right');
+                                    }
+                                }
+                            });
+
+                            if (piece) {
+                                const pieceSpan = document.createElement('span');
+                                pieceSpan.classList.add('piece');
+                                const pieceSetToUse = historicalStateSnapshot.useStandardPieceSymbols ? STANDARD_PIECES : MODERN_PIECES;
+                                pieceSpan.textContent = pieceSetToUse[piece.type]; 
+                                if (piece.color === 'white' && !historicalStateSnapshot.useStandardPieceSymbols) { 
+                                    pieceSpan.classList.add('white-piece-font'); 
+                                }
+                                square.appendChild(pieceSpan);
+                            }
+                            tempBoardForRendering.appendChild(square);
+                        });
+                    });
+                    // Temporarily append to body to make it renderable by html2canvas, then remove
+                    tempBoardForRendering.style.position = 'absolute';
+                    tempBoardForRendering.style.left = '-9999px'; // Off-screen
+                    document.body.appendChild(tempBoardForRendering);
+
 
                     updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
                     await new Promise(resolve => setTimeout(resolve, 50)); 
 
-                    const canvas = await html2canvas(chessboardDiv, {
+                    const canvas = await html2canvas(tempBoardForRendering, { // Capture the temp board
                         allowTaint: true, 
                         useCORS: true, 
                         logging: false,
-                        width: chessboardDiv.offsetWidth,
-                        height: chessboardDiv.offsetHeight,
+                        width: tempBoardForRendering.offsetWidth,
+                        height: tempBoardForRendering.offsetHeight,
                         backgroundColor: null 
                     });
+                    document.body.removeChild(tempBoardForRendering); // Clean up temp board
                     
                     const link = document.createElement('a');
                     link.download = `spell_chess_frame_${String(i).padStart(3, '0')}.png`;
@@ -799,6 +837,7 @@
                 console.error("Error during GIF frame download process:", error);
                 updateStatus("GIF frame download failed.");
             } finally {
+                // Restore the game to its original state
                 const originalGameStateRestored = JSON.parse(originalGameStateSnapshotJSON);
                 for (const key in originalGameStateRestored) {
                     if (Object.prototype.hasOwnProperty.call(originalGameStateRestored, key)) {
@@ -820,44 +859,23 @@
                 downloadGifButton.disabled = false;
                  document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
                     const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion);
-                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button') {
+                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'change-piece-style-button') {
                         btn.disabled = false; 
                     } else if (btn.id.includes('-spell') || btn.id === 'cancel-button') { 
                         btn.disabled = isDisabledByGameLogic;
                     }
                 });
                 updateSpellControls(); 
-                
-                if (gameState.browsingHistoryPly !== -1 && gameState.viewingState) { 
-                     let statusMsg = `Viewing ply ${gameState.viewingState.plyCount}. `;
-                     if (gameState.viewingState.isGameOver) {
-                        statusMsg += gameState.viewingState.gameEndMessage;
-                    } else {
-                        statusMsg += `${gameState.viewingState.currentPlayer.charAt(0).toUpperCase() + gameState.viewingState.currentPlayer.slice(1)} to play.`;
-                        if (isKingInCheck(gameState.viewingState.currentPlayer, gameState.viewingState.board, gameState.viewingState.enPassantTarget, gameState.viewingState.activeSpells, gameState.viewingState.plyCount)) {
-                            statusMsg += " Check!";
-                        }
-                    }
-                    updateStatus(statusMsg);
-                } else if (gameState.isGameOver) {
-                    updateStatus(gameState.gameEndMessage || "Game over.");
-                } else if (gameState.awaitingPromotion) {
-                    updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-                } else {
-                    let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                    if (isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                        statusMsg += " Check!";
-                    }
-                    updateStatus(statusMsg);
-                }
+                updateStatusBasedOnCurrentGameState(); // Use helper for consistent status update
             }
         });
 
+
         function renderBoard() {
             chessboardDiv.innerHTML = '';
-            const stateToRender = gameState.browsingHistoryPly !== -1 && gameState.viewingState 
-                                   ? gameState.viewingState 
-                                   : gameState;
+            const effectivePieceSet = gameState.useStandardPieceSymbols ? STANDARD_PIECES : MODERN_PIECES;
+            
+            const stateToRender = gameState.browsingHistoryPly !== -1 ? gameState.history[gameState.browsingHistoryPly] : gameState;
 
             const boardToRender = stateToRender.board;
             const activeSpellsToRender = stateToRender.activeSpells || [];
@@ -865,7 +883,7 @@
             
             const selectedPieceForHint = (gameState.browsingHistoryPly === -1 && gameState.selectedPiece) 
                                           ? gameState.selectedPiece 
-                                          : null;
+                                          : null; 
             const validMovesForSelected = selectedPieceForHint 
                                           ? getValidMovesForPiece(selectedPieceForHint.r, selectedPieceForHint.c) 
                                           : [];
@@ -912,10 +930,10 @@
                     if (piece) {
                         const pieceSpan = document.createElement('span');
                         pieceSpan.classList.add('piece');
-                        pieceSpan.textContent = PIECES[piece.type]; // This will use the updated PIECES constant
+                        pieceSpan.textContent = effectivePieceSet[piece.type]; 
                         pieceSpan.dataset.pieceId = piece.id;
-                        if (piece.color === 'white') {
-                            pieceSpan.classList.add('white-piece-font'); // Class for white font styling
+                        if (piece.color === 'white' && !gameState.useStandardPieceSymbols) { 
+                            pieceSpan.classList.add('white-piece-font'); 
                         }
                         square.appendChild(pieceSpan);
                     }
@@ -957,17 +975,22 @@
                 return;
             }
             
-            if (gameState.browsingHistoryPly !== -1) {
-                const browsedStatePly = gameState.browsingHistoryPly;
-                gameState = deepCopyFullState(gameState.viewingState); 
-                
-                gameState.history = gameState.history.slice(0, browsedStatePly + 1);
-                gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= browsedStatePly);
-                
+            if (gameState.browsingHistoryPly !== -1) { 
+                // Commit to the browsed state if a move is attempted
+                const browsedPly = gameState.browsingHistoryPly;
+                if(gameState.history[browsedPly]){
+                    gameState = deepCopyFullState(gameState.history[browsedPly]);
+                    gameState.history = gameState.history.slice(0, browsedPly + 1); 
+                    gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= browsedPly);
+                } else {
+                    console.error("Error: Browsed state not found in history on click.");
+                    // Fallback to live state may be needed or just prevent move
+                    return; 
+                }
                 gameState.browsingHistoryPly = -1; 
-                gameState.viewingState = null;
-                gameState.selectedPiece = null; 
-                 updateStatusBasedOnLiveGameState(); 
+                gameState.selectedPiece = null; // Clear selection when forking
+                updateStatusBasedOnCurrentGameState(); 
+                // Now, the click will be processed as a regular move on the new live state
             }
 
 
@@ -1409,6 +1432,8 @@
             const spellCaster = gameState.spellCaster; 
             const playerSpells = gameState.spells[spellCaster];
             const currentCastingGameTurn = gameState.gameTurnNumber; 
+            const pieceSetToUse = gameState.useStandardPieceSymbols ? STANDARD_PIECES : MODERN_PIECES;
+
 
             if (gameState.spellMode === 'jump') {
                 if (targetPiece) {
@@ -1423,7 +1448,7 @@
                     targetPiece.isJumpable = true; 
                     spellApplied = true;
                     spellNotation = `jump@${String.fromCharCode(97 + c_target)}${8 - r_target}`;
-                    updateStatus(`${spellCaster.charAt(0).toUpperCase() + spellCaster.slice(1)} cast Jump on ${PIECES[targetPiece.type]} at ${String.fromCharCode(97 + c_target)}${8 - r_target}. Make your move.`);
+                    updateStatus(`${spellCaster.charAt(0).toUpperCase() + spellCaster.slice(1)} cast Jump on ${pieceSetToUse[targetPiece.type]} at ${String.fromCharCode(97 + c_target)}${8 - r_target}. Make your move.`);
                 } else {
                     updateStatus("Jump spell must target a piece. Select a piece to Jump or Cancel.");
                     renderBoard(); 
@@ -1600,20 +1625,22 @@
         function updateActiveSpells() {
             const stillActive = [];
             let boardNeedsRender = false;
-            const currentActiveSpellsSource = gameState.browsingHistoryPly !== -1 && gameState.viewingState ? gameState.viewingState.activeSpells : gameState.activeSpells;
-            const currentPlyForUpdate = gameState.browsingHistoryPly !== -1 && gameState.viewingState ? gameState.viewingState.plyCount : gameState.plyCount;
+            // Always update activeSpells on the main gameState, 
+            // viewingState will get its own copy if/when it's created.
+            const currentActiveSpellsSource = gameState.activeSpells;
+            const currentPlyForUpdate = gameState.plyCount;
 
 
             currentActiveSpellsSource.forEach(spell => {
                 if (currentPlyForUpdate >= spell.expiresAtPly) { 
                     if (spell.type === 'freeze') {
-                        const boardToAffect = gameState.browsingHistoryPly !== -1 && gameState.viewingState ? gameState.viewingState.board : gameState.board;
+                        const boardToAffect = gameState.board; 
                         spell.affectedPieceIds.forEach(id => { 
                             const piece = findPieceByIdInSpecificBoard(id, boardToAffect); 
                             if (piece) piece.isFrozen = false; 
                         });
                     } else if (spell.type === 'jump') {
-                         const boardToAffect = gameState.browsingHistoryPly !== -1 && gameState.viewingState ? gameState.viewingState.board : gameState.board;
+                         const boardToAffect = gameState.board;
                          const piece = findPieceByIdInSpecificBoard(spell.targetId, boardToAffect);
                          if (piece) piece.isJumpable = false;
                     }
@@ -1622,11 +1649,7 @@
                     stillActive.push(spell); 
                 }
             });
-            if(gameState.browsingHistoryPly === -1){
-                gameState.activeSpells = stillActive; 
-            } else if (gameState.viewingState) {
-                gameState.viewingState.activeSpells = stillActive;
-            }
+            gameState.activeSpells = stillActive; 
             
             if (boardNeedsRender) renderBoard(); 
         }
@@ -1722,6 +1745,7 @@
             stateToSnapshot.blackPlayerTurn = next_blackPlayerTurn_state;
             stateToSnapshot.plyCount = gameState.plyCount; 
             stateToSnapshot.gameEndMessage = gameState.isGameOver ? gameEndMessage : "";
+            stateToSnapshot.useStandardPieceSymbols = gameState.useStandardPieceSymbols; 
             gameState.history.push(stateToSnapshot); 
             
             gameState.moveLog.push({ 
@@ -1778,29 +1802,14 @@
             gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= gameState.plyCount);
 
             gameState.browsingHistoryPly = -1; 
-            gameState.viewingState = null;
             gameState.selectedPiece = null; 
-
 
             renderBoard(); 
             updateSpellControls();
             updateCancelButtonVisibility(); 
             updateNotationDisplay();    
             updateHistoryNavButtons();   
-
-            if (gameState.isGameOver) {
-                updateStatus(gameState.gameEndMessage || "Game over at this point.");
-            } else if (gameState.awaitingPromotion) {
-                 updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-            }
-            else {
-                let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                if (gameState.board && gameState.board.length > 0 && 
-                    isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                    statusMsg += " Check!";
-                }
-                updateStatus(statusMsg);
-            }
+            updateStatusBasedOnCurrentGameState(); // Use helper for consistent status update
         }
 
         function browseHistory(direction) { 
@@ -1810,50 +1819,67 @@
             }
 
             let targetPlyForView;
-            if (gameState.browsingHistoryPly === -1) { 
-                if (direction === -1) { 
-                    if (gameState.plyCount === 0 && gameState.history.length <=1) return; 
-                    targetPlyForView = gameState.plyCount > 0 ? gameState.plyCount -1 : 0; 
-                } else { 
-                    return; 
+            if (gameState.browsingHistoryPly === -1) { // If not currently browsing
+                if (direction === -1) { // Prev
+                    if (gameState.plyCount === 0) return; // Can't go back from initial state
+                    targetPlyForView = gameState.plyCount -1; // The ply of the state *before* the last one made
+                     if(targetPlyForView < 0) targetPlyForView = 0;
+                } else { // Next (direction === 1 from live state)
+                    return; // No "next" when already at the live end of the game
                 }
-            } else {
+            } else { // Already browsing
                 targetPlyForView = gameState.browsingHistoryPly + direction;
             }
             
+            // Clamp targetPlyForView to valid history indices
             if (targetPlyForView < 0) targetPlyForView = 0; 
             if (targetPlyForView >= gameState.history.length) targetPlyForView = gameState.history.length - 1; 
 
-
-            if (targetPlyForView === gameState.plyCount && gameState.browsingHistoryPly !== -1 && direction === 1) { 
+            // If stepping "next" and landing on the current live ply count, exit browsing mode.
+            if (direction === 1 && targetPlyForView === gameState.plyCount) {
                 gameState.browsingHistoryPly = -1;
-                gameState.viewingState = null;
-                gameState.selectedPiece = null;
-                renderBoard(); 
-                updateStatusBasedOnLiveGameState();
+                gameState.viewingState = null; // Clear viewing state
+                gameState.selectedPiece = null; // Clear selection
+                updateStatusBasedOnCurrentGameState(); // Update status for live game
             } else {
                 gameState.browsingHistoryPly = targetPlyForView;
-                gameState.viewingState = deepCopyFullState(gameState.history[targetPlyForView]);
-                gameState.selectedPiece = null; 
-                renderBoard(); 
+                // No need for viewingState, renderBoard will use history[browsingHistoryPly]
+                gameState.selectedPiece = null; // Clear selection when browsing
                 
-                let statusMsg = `Viewing ply ${gameState.viewingState.plyCount}. `;
-                if (gameState.viewingState.isGameOver) {
-                    statusMsg += gameState.viewingState.gameEndMessage;
+                const viewedState = gameState.history[gameState.browsingHistoryPly];
+                let statusMsg = `Viewing ply ${viewedState.plyCount}. `;
+                if (viewedState.isGameOver) {
+                    statusMsg += viewedState.gameEndMessage;
                 } else {
-                    statusMsg += `${gameState.viewingState.currentPlayer.charAt(0).toUpperCase() + gameState.viewingState.currentPlayer.slice(1)} to play.`;
-                    if (isKingInCheck(gameState.viewingState.currentPlayer, gameState.viewingState.board, gameState.viewingState.enPassantTarget, gameState.viewingState.activeSpells, gameState.viewingState.plyCount)) {
+                    statusMsg += `${viewedState.currentPlayer.charAt(0).toUpperCase() + viewedState.currentPlayer.slice(1)} to play.`;
+                    if (isKingInCheck(viewedState.currentPlayer, viewedState.board, viewedState.enPassantTarget, viewedState.activeSpells, viewedState.plyCount)) {
                          statusMsg += " Check!";
                     }
                 }
                 updateStatus(statusMsg);
             }
+            renderBoard(); 
             updateHistoryNavButtons();
             updateSpellControls(); 
             updateCancelButtonVisibility(); 
         }
 
-        function updateStatusBasedOnLiveGameState() {
+        function updateStatusBasedOnCurrentGameState() { 
+            if (gameState.browsingHistoryPly !== -1) { // If browsing, status is handled by browseHistory
+                const viewedState = gameState.history[gameState.browsingHistoryPly];
+                 let statusMsg = `Viewing ply ${viewedState.plyCount}. `;
+                 if (viewedState.isGameOver) {
+                    statusMsg += viewedState.gameEndMessage;
+                } else {
+                    statusMsg += `${viewedState.currentPlayer.charAt(0).toUpperCase() + viewedState.currentPlayer.slice(1)} to play.`;
+                    if (isKingInCheck(viewedState.currentPlayer, viewedState.board, viewedState.enPassantTarget, viewedState.activeSpells, viewedState.plyCount)) {
+                         statusMsg += " Check!";
+                    }
+                }
+                updateStatus(statusMsg);
+                return;
+            }
+            // Live game status
             if (gameState.isGameOver) {
                 updateStatus(gameState.gameEndMessage || "Game over.");
             } else if (gameState.awaitingPromotion) {
@@ -1869,12 +1895,13 @@
 
 
         function updateHistoryNavButtons() {
-            prevMoveButton.disabled = (gameState.browsingHistoryPly === 0) || (gameState.browsingHistoryPly === -1 && gameState.plyCount === 0);
-            nextMoveButton.disabled = (gameState.browsingHistoryPly !== -1 && gameState.browsingHistoryPly >= gameState.history.length - 1) || 
-                                      (gameState.browsingHistoryPly === -1); 
-            if (gameState.browsingHistoryPly !== -1 && gameState.browsingHistoryPly < gameState.plyCount) {
-                nextMoveButton.disabled = false; 
-            }                                      
+            if (gameState.browsingHistoryPly === -1) { // Live game
+                prevMoveButton.disabled = gameState.plyCount === 0;
+                nextMoveButton.disabled = true;
+            } else { // Browsing history
+                prevMoveButton.disabled = gameState.browsingHistoryPly === 0;
+                nextMoveButton.disabled = gameState.browsingHistoryPly >= gameState.history.length - 1 || gameState.browsingHistoryPly >= gameState.plyCount;
+            }
         }
 
         prevMoveButton.addEventListener('click', () => browseHistory(-1));
@@ -1896,7 +1923,7 @@
                     
                     const turnNumSpan = document.createElement('span');
                     turnNumSpan.classList.add('notation-turn-number');
-                    turnNumSpan.textContent = `${moveEntry.turn}.`;
+                    turnNumSpan.textContent = `${moveEntry.turn}. `; 
                     currentTurnDiv.appendChild(turnNumSpan);
                     lastTurnNumberProcessed = moveEntry.turn;
                 }
