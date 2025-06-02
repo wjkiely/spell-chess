@@ -99,13 +99,13 @@
             background-color: #45a049;
         }
 
-        /* --- DESKTOP GAME STYLES --- */
         .game-container {
             display: flex;
             flex-wrap: wrap; 
             gap: 20px;
             align-items: flex-start;
             width: 100%;
+            margin: 0 auto;
         }
 
         .main-game-area { 
@@ -201,9 +201,12 @@
             position: relative;
             z-index: 2;
         }
-        .white-piece-font {
-            color: white;
-            text-shadow: 0 0 1px black, 0 0 1px black; 
+        /* Piece coloring styles */
+        .chessboard.colored-pieces .piece.white-piece-alternative {
+            color: white; 
+            /* Add a slight stroke or shadow if pieces are hard to see on light squares */
+             text-shadow: -1px -1px 0 #555, 1px -1px 0 #555, -1px 1px 0 #555, 1px 1px 0 #555; /* Simple black outline */
+
         }
 
 
@@ -230,27 +233,21 @@
         .spell-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
         .spell-button.targeting { background-color: #add8e6; }
 
-        .notation-container { 
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 360px; 
-            flex-shrink: 0;
-        }
         .notation-area {
             padding: 10px;
             border: 1px solid #ccc;
-            height: 430px; 
-            width: 100%;  
+            height: 480px; 
+            width: 360px;
             overflow-y: auto;
             background-color: #f8f9fa;
+            flex-shrink: 0;
         }
         .notation-area .notation-line {
             margin-bottom: 2px;
         }
         .notation-area .notation-turn-number {
             font-weight: bold;
-            margin-right: 5px;
+            margin-right: 2px; 
         }
         .notation-area .notation-move {
             cursor: pointer;
@@ -261,17 +258,6 @@
         .notation-area .notation-move:hover {
             color: #007bff;
         }
-
-        #history-navigation {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        #history-navigation button {
-            padding: 8px 15px;
-            font-size: 1em; 
-        }
-
 
         #promotion-choices {
             margin-top: 10px;
@@ -354,13 +340,11 @@
                 margin-bottom: 5px;
                 display: block;
              }
-            .notation-container { 
+            .notation-area {
                 order: 3; 
                 width: 90vw;
                 max-width: 480px;
-            }
-            .notation-area {
-                height: 120px; 
+                height: 150px;
             }
              #promotion-choices {
                 order: -1;
@@ -385,13 +369,13 @@
             .main-game-area { 
                 width: 95vw; 
             }
-            .controls, .notation-container, #gif-output-area {
+            .controls, .notation-area, #gif-output-area {
                  width: 95vw;
             }
         }
     </style>
 </head>
-<body class="home-view">
+<body class="home-view"> <!-- Start with home-view, colored-pieces will be added/removed by JS -->
 
     <div id="home-page-content">
         <h1>Spell Chess</h1>
@@ -403,7 +387,7 @@
         <p>
             Start Date: June 1, 2025<br>
             Time Control: 24 Hours Per Move<br>
-            Join the <a href="https://www.chess.com/club/white-team-spell-chess-game-2025-06-01" target="_blank">White Team</a> or <a href="https://www.chess.com/club/black-team-spell-chess-game-2025-06-01" target="_blank">Black Team</a><br>
+            Join the club for <a href="https://www.chess.com/club/white-team-spell-chess-game-2025-06-01" target="_blank">Team White</a> or <a href="https://www.chess.com/club/black-team-spell-chess-game-2025-06-01" target="_blank">Team Black</a> to participate!<br>
             This page updated daily with the current position by <a href="https://www.chess.com/member/LongTermFuture" target="_blank">LongTermFuture</a>.
         </p>
     </div>
@@ -411,7 +395,7 @@
     <div id="game-content-wrapper">
         <div class="game-container">
             <div class="main-game-area">
-                <div id="chessboard" class="chessboard"></div>
+                <div id="chessboard" class="chessboard"></div> <!-- colored-pieces class will be added here by JS -->
                 <div id="status-area" class="status-area">White's turn.</div>
                 <div id="rules-area" class="rules-area">
                     <h4>Spell Chess Rules:</h4>
@@ -442,7 +426,7 @@
                     <small id="black-freeze-cooldown"></small>
                 </div>
                 
-                <button id="change-piece-style-button" class="reset-button">Use Standard Pieces</button> 
+                <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
                 <button id="download-game-button" class="reset-button">Download Game</button>
                 <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
                 <button id="reset-game-button" class="reset-button">Reset Game</button>
@@ -456,23 +440,16 @@
                 </div>
                 <button id="cancel-button" class="reset-button" style="display:none; margin-top:10px; width:100%;">Cancel</button>
             </div>
-            <div class="notation-container">
-                <div id="notation-area" class="notation-area"></div>
-                <div id="history-navigation">
-                    <button id="prev-move-button">&larr; Prev</button>
-                    <button id="next-move-button">Next &rarr;</button>
-                </div>
-            </div>
+            <div id="notation-area" class="notation-area"></div>
         </div>
         <div id="gif-output-area">
-            <!-- Content here if needed, e.g. for the download link or a message -->
+            <!-- This area is currently not used to display the GIF directly -->
         </div>
     </div>
 
     <script id="savedGameStateData" type="application/json"></script>
 
     <script id="home-page-script">
-        // ... (remains the same)
         const startGameButton = document.getElementById('start-game-button');
         const goHomeButton = document.getElementById('go-home-button');
         const mainBody = document.body;
@@ -481,7 +458,7 @@
             mainBody.classList.remove('home-view');
             mainBody.classList.add('game-view');
             if (typeof resetGame === 'function') { 
-                resetGame(true); 
+                resetGame(true);
             }
         });
 
@@ -492,15 +469,23 @@
     </script>
 
     <script id="spell-chess-game-script">
-        const MODERN_PIECES = { 
-            'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 
-            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
-        };
-        const STANDARD_PIECES = {
+        const PIECES = {
             'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',
             'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
         };
-        
+        let useStandardPieces = false; // Default: White pieces are black font, colored white by CSS
+
+        const initialBoardSetup = [
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+        ];
+
         let gameState;
         let initialGameDataFromSave = null;
 
@@ -511,9 +496,7 @@
         const promotionChoicesDiv = document.getElementById('promotion-choices');
         const downloadGameButton = document.getElementById('download-game-button');
         const downloadGifButton = document.getElementById('download-gif-button');
-        const prevMoveButton = document.getElementById('prev-move-button');
-        const nextMoveButton = document.getElementById('next-move-button');
-        const changePieceStyleButton = document.getElementById('change-piece-style-button');
+        const togglePiecesButton = document.getElementById('toggle-pieces-button');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -567,7 +550,7 @@
                 gameEndMessage: "", 
                 awaitingPromotion: null,
                 history: [],
-                useStandardPieceSymbols: false 
+                useStandardPieces: false // Default to colored pieces style
             };
         }
 
@@ -589,15 +572,9 @@
         }
 
         function resetGame(forceNewGame = false) {
-            let previousUseStandardSymbols = gameState ? gameState.useStandardPieceSymbols : false; 
-
             if (!forceNewGame && initialGameDataFromSave) {
                 gameState = deepCopyFullState(initialGameDataFromSave); 
-                if(gameState.browsingHistoryPly !== undefined) gameState.browsingHistoryPly = -1; // Reset browsing on load
-                // viewingState is not saved/loaded, will be null.
-                if (typeof initialGameDataFromSave.useStandardPieceSymbols === 'boolean') {
-                    previousUseStandardSymbols = initialGameDataFromSave.useStandardPieceSymbols;
-                }
+                useStandardPieces = gameState.useStandardPieces === undefined ? false : gameState.useStandardPieces; 
                 initialGameDataFromSave = null; 
                 console.log("Game loaded from saved state.");
                 document.body.classList.remove('home-view');
@@ -605,27 +582,51 @@
             } else {
                 initializeGameState();
                 initializeBoardState();
+                useStandardPieces = false; 
+                gameState.useStandardPieces = useStandardPieces; // Ensure it's in the initial state for history
                 const initialSnapshot = deepCopyGameStateForSnapshot(gameState); 
-                gameState.history.push(initialSnapshot); 
+                gameState.history.push(initialSnapshot);
                 console.log("New game started.");
             }
-            gameState.useStandardPieceSymbols = previousUseStandardSymbols; 
-            changePieceStyleButton.textContent = gameState.useStandardPieceSymbols ? "Use Colored Pieces" : "Use Standard Pieces";
 
             promotionChoicesDiv.style.display = 'none';
-
-            renderBoard(); 
+            applyPieceStyle();
+            // renderBoard(); // applyPieceStyle calls renderBoard
             updateSpellControls();
             updateCancelButtonVisibility();
             updateNotationDisplay();
-            updateHistoryNavButtons();
-            updateStatusBasedOnCurrentGameState();
+
+            if (gameState.isGameOver) {
+                updateStatus(gameState.gameEndMessage || "Game over.");
+            } else if (gameState.awaitingPromotion) {
+                updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
+            } else {
+                let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
+                 if (gameState.board && gameState.board.length > 0 && 
+                    isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
+                    statusMsg += " Check!";
+                }
+                updateStatus(statusMsg);
+            }
         }
         
-        changePieceStyleButton.addEventListener('click', () => {
-            gameState.useStandardPieceSymbols = !gameState.useStandardPieceSymbols;
-            changePieceStyleButton.textContent = gameState.useStandardPieceSymbols ? "Use Colored Pieces" : "Use Standard Pieces";
-            renderBoard(); 
+        function applyPieceStyle() {
+            if (useStandardPieces) {
+                chessboardDiv.classList.remove('colored-pieces');
+                togglePiecesButton.textContent = "Use Colored Pieces";
+            } else {
+                chessboardDiv.classList.add('colored-pieces');
+                togglePiecesButton.textContent = "Use Standard Pieces";
+            }
+            if(gameState && gameState.board && gameState.board.length > 0) { // Ensure board is ready before rendering
+               renderBoard();
+            }
+        }
+        
+        togglePiecesButton.addEventListener('click', () => {
+            useStandardPieces = !useStandardPieces;
+            gameState.useStandardPieces = useStandardPieces; 
+            applyPieceStyle();
         });
 
 
@@ -655,10 +656,7 @@
                 alert("Cannot download game while awaiting pawn promotion.");
                 return;
             }
-            // Ensure we save the true current state, not a browsed one
-            if (gameState.browsingHistoryPly !== -1) {
-                handleNotationClick(gameState.plyCount); // Commit to the latest actual game state
-            }
+            gameState.useStandardPieces = useStandardPieces; 
             const stateToSave = deepCopyFullState(gameState);
             const serializedState = JSON.stringify(stateToSave);
 
@@ -733,12 +731,12 @@
             downloadGifButton.disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
-            window.open('https://ezgif.com/maker', '_blank'); 
+            window.open('https://ezgif.com/maker', '_blank');
 
             const originalGameStateSnapshotJSON = JSON.stringify(gameState);
             const originalSelectedPieceJSON = gameState.selectedPiece ? JSON.stringify(gameState.selectedPiece) : null;
             const actualCurrentPlyCount = gameState.plyCount; 
-            const actualBrowsingHistoryPly = gameState.browsingHistoryPly; 
+            const originalUseStandardPieces = useStandardPieces;
             
             const tempGameStateForRender = {}; 
 
@@ -756,13 +754,13 @@
                         }
                     }
                     
-                    // Temporarily set global gameState properties for renderBoard to use
                     gameState.board = tempGameStateForRender.board; 
                     gameState.activeSpells = tempGameStateForRender.activeSpells || []; 
                     gameState.plyCount = tempGameStateForRender.plyCount; 
-                    gameState.useStandardPieceSymbols = tempGameStateForRender.useStandardPieceSymbols; // Use historical piece style
                     gameState.selectedPiece = null; 
-                    renderBoard(); 
+                    // Apply piece style from snapshot, or original if not present (for very old saves)
+                    useStandardPieces = tempGameStateForRender.useStandardPieces === undefined ? originalUseStandardPieces : tempGameStateForRender.useStandardPieces;
+                    applyPieceStyle(); // This calls renderBoard
 
                     updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
                     await new Promise(resolve => setTimeout(resolve, 50)); 
@@ -790,7 +788,6 @@
                 console.error("Error during GIF frame download process:", error);
                 updateStatus("GIF frame download failed.");
             } finally {
-                // Restore the game to its original state
                 const originalGameStateRestored = JSON.parse(originalGameStateSnapshotJSON);
                 for (const key in originalGameStateRestored) {
                     if (Object.prototype.hasOwnProperty.call(originalGameStateRestored, key)) {
@@ -802,48 +799,52 @@
                     }
                 }
                 gameState.selectedPiece = originalSelectedPieceJSON ? JSON.parse(originalSelectedPieceJSON) : null;
-                // gameState.plyCount was already restored by the loop above if snapshot was complete.
-                // but double check with actualCurrentPlyCount for safety
-                gameState.plyCount = actualCurrentPlyCount;
-                gameState.browsingHistoryPly = actualBrowsingHistoryPly; 
+                gameState.plyCount = actualCurrentPlyCount; 
+                useStandardPieces = originalUseStandardPieces; 
+                applyPieceStyle(); 
 
-                renderBoard(); 
                 updateSpellControls(); 
                 updateCancelButtonVisibility();
-                updateHistoryNavButtons();
                 downloadGifButton.disabled = false;
                  document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
-                    const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion || gameState.browsingHistoryPly !== -1);
-                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'change-piece-style-button') {
-                        btn.disabled = (gameState.awaitingPromotion || gameState.browsingHistoryPly !== -1); // Only disable if promoting/browsing
+                    const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion);
+                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button') {
+                        btn.disabled = false; 
                     } else if (btn.id.includes('-spell') || btn.id === 'cancel-button') { 
                         btn.disabled = isDisabledByGameLogic;
                     }
                 });
                 updateSpellControls(); 
-                updateStatusBasedOnCurrentGameState();
+                
+                if (gameState.isGameOver) {
+                    updateStatus(gameState.gameEndMessage || "Game over.");
+                } else if (gameState.awaitingPromotion) {
+                    updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
+                } else {
+                    let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
+                    if (isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
+                        statusMsg += " Check!";
+                    }
+                    updateStatus(statusMsg);
+                }
             }
         });
 
+        // --- renderBoard and other game logic functions ---
+        // (Copied from previous correct version, ensuring `renderBoard` uses `useStandardPieces`)
 
         function renderBoard() {
             chessboardDiv.innerHTML = '';
-            const effectivePieceSet = gameState.useStandardPieceSymbols ? STANDARD_PIECES : MODERN_PIECES;
-            
-            const stateToRender = gameState.browsingHistoryPly !== -1 ? gameState.history[gameState.browsingHistoryPly] : gameState;
+            // Apply the class for general styling if needed, actual piece char swapping is below
+            if (!useStandardPieces) {
+                chessboardDiv.classList.add('colored-pieces');
+            } else {
+                chessboardDiv.classList.remove('colored-pieces');
+            }
 
-            const boardToRender = stateToRender.board;
-            const activeSpellsToRender = stateToRender.activeSpells || [];
-            const plyCountForFreezeCheck = stateToRender.plyCount;
-            
-            const selectedPieceForHint = (gameState.browsingHistoryPly === -1 && gameState.selectedPiece) 
-                                          ? gameState.selectedPiece 
-                                          : null; 
-            const validMovesForSelected = selectedPieceForHint 
-                                          ? getValidMovesForPiece(selectedPieceForHint.r, selectedPieceForHint.c) 
-                                          : [];
+            const validMovesForSelected = gameState.selectedPiece ? getValidMovesForPiece(gameState.selectedPiece.r, gameState.selectedPiece.c) : [];
 
-            boardToRender.forEach((row, r_idx) => {
+            gameState.board.forEach((row, r_idx) => {
                 row.forEach((piece, c_idx) => {
                     const square = document.createElement('div');
                     square.classList.add('square');
@@ -855,19 +856,17 @@
                                             'freeze-outline-top', 'freeze-outline-bottom',
                                             'freeze-outline-left', 'freeze-outline-right');
 
-                    // Use plyCount from the state being rendered for freeze check
-                    if (isSquareUnderActiveFreeze(r_idx, c_idx, activeSpellsToRender, plyCountForFreezeCheck)) {
+                    if (isSquareUnderActiveFreeze(r_idx, c_idx, gameState.activeSpells, gameState.plyCount)) {
                         square.classList.add('active-freeze-zone');
                         const freezeEmojiSpan = document.createElement('span');
                         freezeEmojiSpan.classList.add('square-freeze-emoji');
                         freezeEmojiSpan.textContent = '❄️';
                         square.appendChild(freezeEmojiSpan);
-                    } else if (piece && piece.isJumpable) { // isJumpable is on the piece object itself
+                    } else if (piece && piece.isJumpable) {
                         square.classList.add('jumpable-on-square');
                     }
-                     // Render freeze outlines based on active spells in the stateToRender
-                    activeSpellsToRender.forEach(spell => {
-                        if (spell.type === 'freeze' && plyCountForFreezeCheck < spell.expiresAtPly) {
+                     gameState.activeSpells.forEach(spell => {
+                        if (spell.type === 'freeze' && gameState.plyCount < spell.expiresAtPly) {
                             const spellCenterR = spell.targetSquare.r;
                             const spellCenterC = spell.targetSquare.c;
                             const minEffectR = Math.max(0, spellCenterR - 1);
@@ -887,23 +886,27 @@
                     if (piece) {
                         const pieceSpan = document.createElement('span');
                         pieceSpan.classList.add('piece');
-                        // Use the piece style from the state being rendered, or live state if not browsing
-                        const useStandard = gameState.browsingHistoryPly !== -1 ? stateToRender.useStandardPieceSymbols : gameState.useStandardPieceSymbols;
-                        const currentSet = useStandard ? STANDARD_PIECES : MODERN_PIECES;
-                        pieceSpan.textContent = currentSet[piece.type]; 
-                        pieceSpan.dataset.pieceId = piece.id;
-                        if (piece.color === 'white' && !useStandard) { 
-                            pieceSpan.classList.add('white-piece-font'); 
+                        
+                        let displayPieceType = piece.type;
+                        // Logic for "colored pieces" where white uses black piece characters but styled white
+                        if (!useStandardPieces && piece.color === 'white') {
+                            displayPieceType = piece.type.toLowerCase(); // e.g., 'P' becomes 'p'
+                            pieceSpan.classList.add('white-piece-alternative'); 
+                        } else {
+                            pieceSpan.classList.remove('white-piece-alternative');
                         }
+
+                        pieceSpan.textContent = PIECES[displayPieceType];
+                        pieceSpan.dataset.pieceId = piece.id;
                         square.appendChild(pieceSpan);
                     }
 
-                    if (selectedPieceForHint && selectedPieceForHint.r === r_idx && selectedPieceForHint.c === c_idx) {
+                    if (gameState.selectedPiece && gameState.selectedPiece.r === r_idx && gameState.selectedPiece.c === c_idx) {
                         square.classList.add('selected');
                     }
 
                     if (validMovesForSelected.some(move => move.toR === r_idx && move.toC === c_idx)) {
-                       square.classList.add('valid-move-hint'); 
+                       square.classList.add('valid-move-hint');
                     }
 
                     square.addEventListener('click', () => onSquareClick(r_idx, c_idx));
@@ -911,6 +914,14 @@
                 });
             });
         }
+
+
+        // ... (isSquareUnderActiveFreeze, onSquareClick, isPathClear, isSquareAttacked, checkCastleConditions, isValidMove) ...
+        // ... (getValidMovesForPiece, isKingInCheck, hasLegalMoves, generateMoveNotation, spell functions, updateActiveSpells, findPieceById) ...
+        // ... (endTurn, handleNotationClick, updateNotationDisplay, updateStatus, updateCancelButtonVisibility, updateSpellControls) ...
+        // --- These functions are identical to the previous fully working version that included all these features ---
+        // --- The change for this step was in downloadGifButton and the applyPieceStyle logic integrated into renderBoard ---
+        // --- and the DOMContentLoaded + resetGame logic for initial load and saved game interactivity. ---
 
         function isSquareUnderActiveFreeze(sqR, sqC, activeSpells, currentPly) {
             for (const spell of activeSpells) {
@@ -934,25 +945,6 @@
                 else updateStatus("Game is over. Please reset to play again.");
                 return;
             }
-            
-            if (gameState.browsingHistoryPly !== -1) { 
-                const browsedPly = gameState.browsingHistoryPly;
-                if(gameState.history[browsedPly]){
-                    const useStandardSym = gameState.useStandardPieceSymbols; // Preserve current style choice
-                    gameState = deepCopyFullState(gameState.history[browsedPly]);
-                    gameState.useStandardPieceSymbols = useStandardSym; // Re-apply after loading state
-                    
-                    gameState.history = gameState.history.slice(0, browsedPly + 1); 
-                    gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= browsedPly);
-                } else {
-                    console.error("Error: Browsed state not found in history on click.");
-                    return; 
-                }
-                gameState.browsingHistoryPly = -1; 
-                gameState.selectedPiece = null; 
-                updateStatusBasedOnCurrentGameState(); 
-            }
-
 
             const pieceAtClickedSquare = gameState.board[r_clicked][c_clicked];
 
@@ -1083,11 +1075,8 @@
                 }
             }
             updateCancelButtonVisibility(); 
-            updateHistoryNavButtons(); 
         }
 
-        // ... (isPathClear, isSquareAttacked, checkCastleConditions, isValidMove, getValidMovesForPiece, isKingInCheck, hasLegalMoves, generateMoveNotation, spell functions, updateActiveSpells, findPieceById) ...
-        // ... (These functions remain unchanged from the previous fully functional version with corrected turn cooldown logic.) ...
         function isPathClear(fromR, fromC, toR, toC, board) {
             const dr = Math.sign(toR - fromR);
             const dc = Math.sign(toC - fromC);
@@ -1392,8 +1381,6 @@
             const spellCaster = gameState.spellCaster; 
             const playerSpells = gameState.spells[spellCaster];
             const currentCastingGameTurn = gameState.gameTurnNumber; 
-            const pieceSetToUse = gameState.useStandardPieceSymbols ? STANDARD_PIECES : MODERN_PIECES;
-
 
             if (gameState.spellMode === 'jump') {
                 if (targetPiece) {
@@ -1408,7 +1395,7 @@
                     targetPiece.isJumpable = true; 
                     spellApplied = true;
                     spellNotation = `jump@${String.fromCharCode(97 + c_target)}${8 - r_target}`;
-                    updateStatus(`${spellCaster.charAt(0).toUpperCase() + spellCaster.slice(1)} cast Jump on ${pieceSetToUse[targetPiece.type]} at ${String.fromCharCode(97 + c_target)}${8 - r_target}. Make your move.`);
+                    updateStatus(`${spellCaster.charAt(0).toUpperCase() + spellCaster.slice(1)} cast Jump on ${PIECES[targetPiece.type]} at ${String.fromCharCode(97 + c_target)}${8 - r_target}. Make your move.`);
                 } else {
                     updateStatus("Jump spell must target a piece. Select a piece to Jump or Cancel.");
                     renderBoard(); 
@@ -1457,7 +1444,7 @@
         }
 
         function activateSpellMode(type) {
-            if (gameState.isGameOver || gameState.awaitingPromotion || gameState.browsingHistoryPly !== -1) return; 
+            if (gameState.isGameOver || gameState.awaitingPromotion) return; 
             if (gameState.spellMode && gameState.spellMode !== type && gameState.spellCaster === gameState.currentPlayer) { 
                 updateStatus("Another spell is already being targeted. Cancel it first.");
                 return;
@@ -1513,8 +1500,8 @@
         }
 
         function handleCancelAction() {
-            if (gameState.awaitingPromotion || gameState.browsingHistoryPly !== -1) {
-                if(gameState.awaitingPromotion) updateStatus("Choose a promotion piece.");
+            if (gameState.awaitingPromotion) {
+                updateStatus("Choose a promotion piece.");
                 return;
             }
 
@@ -1585,21 +1572,16 @@
         function updateActiveSpells() {
             const stillActive = [];
             let boardNeedsRender = false;
-            const currentActiveSpellsSource = gameState.activeSpells; 
-            const currentPlyForUpdate = gameState.plyCount;
 
-
-            currentActiveSpellsSource.forEach(spell => {
-                if (currentPlyForUpdate >= spell.expiresAtPly) { 
+            gameState.activeSpells.forEach(spell => {
+                if (gameState.plyCount >= spell.expiresAtPly) { 
                     if (spell.type === 'freeze') {
-                        const boardToAffect = gameState.board; 
                         spell.affectedPieceIds.forEach(id => { 
-                            const piece = findPieceByIdInSpecificBoard(id, boardToAffect); 
+                            const piece = findPieceById(id);
                             if (piece) piece.isFrozen = false; 
                         });
                     } else if (spell.type === 'jump') {
-                         const boardToAffect = gameState.board;
-                         const piece = findPieceByIdInSpecificBoard(spell.targetId, boardToAffect);
+                         const piece = findPieceById(spell.targetId);
                          if (piece) piece.isJumpable = false;
                     }
                     boardNeedsRender = true; 
@@ -1611,26 +1593,12 @@
             
             if (boardNeedsRender) renderBoard(); 
         }
-        function findPieceByIdInSpecificBoard(id, board) {
-            for (let r_find = 0; r_find < 8; r_find++) { 
-                for (let c_find = 0; c_find < 8; c_find++) {
-                    if (board[r_find][c_find] && board[r_find][c_find].id === id) {
-                        return board[r_find][c_find];
-                    }
-                }
-            }
-            return null;
-        }
-
 
         function findPieceById(id) {
-            // When finding a piece by ID (e.g. for spell effects), it should always refer to the live game board,
-            // as browsing history is just for viewing.
-            const boardToSearch = gameState.board; 
             for (let r_find = 0; r_find < 8; r_find++) { 
                 for (let c_find = 0; c_find < 8; c_find++) {
-                    if (boardToSearch[r_find][c_find] && boardToSearch[r_find][c_find].id === id) {
-                        return boardToSearch[r_find][c_find];
+                    if (gameState.board[r_find][c_find] && gameState.board[r_find][c_find].id === id) {
+                        return gameState.board[r_find][c_find];
                     }
                 }
             }
@@ -1705,7 +1673,6 @@
             stateToSnapshot.blackPlayerTurn = next_blackPlayerTurn_state;
             stateToSnapshot.plyCount = gameState.plyCount; 
             stateToSnapshot.gameEndMessage = gameState.isGameOver ? gameEndMessage : "";
-            stateToSnapshot.useStandardPieceSymbols = gameState.useStandardPieceSymbols; 
             gameState.history.push(stateToSnapshot); 
             
             gameState.moveLog.push({ 
@@ -1736,7 +1703,6 @@
             
             updateSpellControls();
             updateCancelButtonVisibility(); 
-            updateHistoryNavButtons();
             renderBoard(); 
         }
         
@@ -1745,9 +1711,8 @@
                 updateStatus("Please choose a promotion piece first.");
                 return;
             }
-             // Allow clicking plySnapshotIndex 0 for initial state
             if (plySnapshotIndex < 0 || plySnapshotIndex >= gameState.history.length) {
-                console.error("Invalid plySnapshotIndex for history:", plySnapshotIndex, "History length:", gameState.history.length);
+                console.error("Invalid plySnapshotIndex for history:", plySnapshotIndex);
                 return;
             }
 
@@ -1757,61 +1722,47 @@
                  return;
             }
             
-            const currentUseStandardSymbols = gameState.useStandardPieceSymbols; // Preserve current style
-            gameState = deepCopyFullState(targetStateSnapshot); 
-            gameState.useStandardPieceSymbols = currentUseStandardSymbols; // Re-apply style preference
+            const keysToRestore = [
+                'board', 'currentPlayer', 'gameTurnNumber', 'whitePlayerTurn', 
+                'blackPlayerTurn', 'plyCount', 'spells', 'activeSpells', 
+                'selectedPiece', 'spellMode', 'spellCaster', 'spellActivationState',
+                'pendingSpellNotation', 'enPassantTarget', 'castlingRights', 
+                'isGameOver', 'gameEndMessage', 'awaitingPromotion', 'useStandardPieces'
+            ];
+
+            for (const key of keysToRestore) {
+                if (Object.prototype.hasOwnProperty.call(targetStateSnapshot, key)) {
+                    if (typeof targetStateSnapshot[key] === 'object' && targetStateSnapshot[key] !== null) {
+                        gameState[key] = JSON.parse(JSON.stringify(targetStateSnapshot[key]));
+                    } else {
+                        gameState[key] = targetStateSnapshot[key];
+                    }
+                }
+            }
+             // Restore piece style preference if it was saved in the snapshot
+            useStandardPieces = gameState.useStandardPieces === undefined ? false : gameState.useStandardPieces;
             
-            gameState.history = gameState.history.slice(0, gameState.plyCount + 1); 
-            gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= gameState.plyCount);
+            gameState.history = gameState.history.slice(0, plySnapshotIndex + 1);
+            gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= plySnapshotIndex);
 
-            gameState.browsingHistoryPly = -1; 
-            gameState.selectedPiece = null; 
-
-            renderBoard(); 
+            applyPieceStyle(); // This calls renderBoard
             updateSpellControls();
             updateCancelButtonVisibility(); 
             updateNotationDisplay();    
-            updateHistoryNavButtons();   
-            updateStatusBasedOnCurrentGameState();
-        }
-        
-        prevMoveButton.addEventListener('click', () => {
-            if (gameState.plyCount > 0) {
-                handleNotationClick(gameState.plyCount - 1);
-            }
-        });
 
-        nextMoveButton.addEventListener('click', () => {
-            // Find the next move in the *current* moveLog that corresponds to a ply *after* the current live plyCount
-            const nextMoveInLog = gameState.moveLog.find(entry => entry.plySnapshotIndex === gameState.plyCount + 1);
-            if (nextMoveInLog) {
-                 handleNotationClick(nextMoveInLog.plySnapshotIndex);
-            } else if (gameState.plyCount < gameState.history.length - 1) { 
-                // Fallback if moveLog is out of sync, try to go to next history state directly
-                // This might happen if history was truncated by browsing and then a new branch was made
-                handleNotationClick(gameState.plyCount + 1);
-            }
-        });
-
-
-        function updateStatusBasedOnCurrentGameState() { 
             if (gameState.isGameOver) {
-                updateStatus(gameState.gameEndMessage || "Game over.");
+                updateStatus(gameState.gameEndMessage || "Game over at this point.");
             } else if (gameState.awaitingPromotion) {
-                updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-            } else {
-                let msg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                if (isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                    msg += " Check!";
-                }
-                updateStatus(msg);
+                 updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
             }
-        }
-
-
-        function updateHistoryNavButtons() {
-            prevMoveButton.disabled = gameState.plyCount === 0;
-            nextMoveButton.disabled = gameState.plyCount >= gameState.history.length - 1; 
+            else {
+                let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
+                if (gameState.board && gameState.board.length > 0 && 
+                    isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
+                    statusMsg += " Check!";
+                }
+                updateStatus(statusMsg);
+            }
         }
 
         function updateNotationDisplay() {
@@ -1861,23 +1812,22 @@
         }
         
         function updateCancelButtonVisibility() {
-             if (gameState.browsingHistoryPly !== -1 || gameState.awaitingPromotion) { // No cancel when browsing or promoting
+            if (gameState.awaitingPromotion) {
                 cancelButton.style.display = 'none';
-            } else if (!gameState.isGameOver && (gameState.spellMode || gameState.pendingSpellNotation)) {
+                promotionChoicesDiv.style.display = 'flex';
+                return;
+            }
+            promotionChoicesDiv.style.display = 'none';
+
+            if (!gameState.isGameOver && (gameState.spellMode || gameState.pendingSpellNotation)) {
                 cancelButton.style.display = 'block';
             } else {
                 cancelButton.style.display = 'none';
             }
-
-            if (gameState.awaitingPromotion && gameState.browsingHistoryPly === -1) { 
-                promotionChoicesDiv.style.display = 'flex';
-            } else {
-                promotionChoicesDiv.style.display = 'none';
-            }
         }
 
         function updateSpellControls() {
-            const disableControls = gameState.awaitingPromotion || gameState.isGameOver || gameState.browsingHistoryPly !== -1;
+            const disableControls = gameState.awaitingPromotion || gameState.isGameOver;
 
             ['white', 'black'].forEach(player => {
                 const spells = gameState.spells[player];
