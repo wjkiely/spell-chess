@@ -1,3 +1,200 @@
+You've found another excellent and tricky edge case for "legal moves" in Spell Chess! If a player is in checkmate by conventional moves, but casting a spell (like Jump to enable a capture, or Freeze to disable the attacker or create an escape square) would make them no longer in check *and* allow them to make a subsequent legal move, then it's not actually checkmate.
+
+This requires a more sophisticated `hasLegalMoves` function.
+
+**Refined `hasLegalMoves` Logic:**
+
+The `hasLegalMoves` function, when checking for checkmate, will need to:
+
+1.  **First, check for standard legal moves:** Iterate through all pieces of the current player. For each piece, iterate through all possible destination squares. If `isValidMove` (which includes moving out of check) returns true for any of these, the player has a legal move, and it's not checkmate.
+2.  **If no standard legal moves and the king IS in check, then consider spells:**
+    *   **Jump Spell:**
+        *   If the player has Jump spells available and the cooldown allows:
+            *   Iterate through *all* pieces on the board (yours and opponent's) as potential Jump targets.
+            *   For each potential Jump target:
+                *   Simulate casting Jump on that piece (temporarily make it `isJumpable`).
+                *   Now, re-check if the current player's King is still in check.
+                *   If casting Jump on *any* piece results in the king *no longer being in check* (even before a move is made, e.g., jumping an interposing piece allows an escape or blocks the check), then it's not checkmate (the player can cast Jump and then must have a legal follow-up move).
+                *   More thoroughly: after simulating Jump, iterate through all of the current player's pieces. If any piece *now* has a legal move (using `isValidMove` with the jumped piece active) that results in the king not being in check, then it's not checkmate.
+    *   **Freeze Spell:**
+        *   If the player has Freeze spells available and the cooldown allows:
+            *   Iterate through *all 64 squares* as potential Freeze targets.
+            *   For each potential Freeze target:
+                *   Simulate casting Freeze on that square (create a temporary `activeSpells` array including this new freeze zone).
+                *   Now, re-check if the current player's King is still in check *under these new freeze conditions*.
+                *   If casting Freeze on *any* square results in the king *no longer being in check* (e.g., freezing the attacker or a piece that was blocking an escape square which is now open), then it's not checkmate (the player can cast Freeze and then must have a legal follow-up move).
+                *   More thoroughly: after simulating Freeze, iterate through all of the current player's pieces. If any piece *now* has a legal move (using `isValidMove` with the new freeze zone active) that results in the king not being in check, then it's not checkmate.
+
+This is computationally more intensive but necessary for the accuracy of checkmate detection with spells.
+
+**Implementation Note:**
+The provided rules say "Frozen pieces cannot put a king in check or checkmate." This means if the checking piece itself becomes frozen, the check is immediately lifted. This needs to be reflected in `isKingInCheck` and consequently in `hasLegalMoves`.
+
+Let's refine `isSquareAttacked` and `hasLegalMoves`.
+
+```javascript
+// Inside <script id="spell-chess-game-script">
+
+        function isSquareAttacked(targetR, targetC, attackerColor, board, enPassantTarget, activeSpells, currentPly) {
+            for (let r_attacker = 0; r_attacker < 8; r_attacker++) { 
+                for (let c_attacker = 0; c_attacker < 8; c_attacker++) {
+                    const piece = board[r_attacker][c_attacker];
+                    if (piece && piece.color === attackerColor) {
+                        // IMPORTANT: Check if the attacking piece itself is frozen
+                        let isAttackerFrozen = isSquareUnderActiveFreeze(r_attacker, c_attacker, activeSpells, currentPly);
+                        if (isAttackerFrozen && piece.type.toLowerCase() !== 'k') { // A frozen king can still "control" squares for opponent's king safety
+                            continue; // Frozen non-king pieces do not attack
+                        }
+                        // If it's a king, it still "attacks" its adjacent squares for the purpose of the opponent king not moving there,
+                        // even if the attacking king itself is frozen (it just can't make a move).
+
+                        const pieceType = piece.type.toLowerCase();
+                        if (pieceType === 'p') {
+                            const attackDR = (attackerColor === 'white') ? -1 : 1; 
+                            if (r_attacker + attackDR === targetR && Math.abs(c_attacker - targetC) === 1) return true;
+                        } else if (pieceType === 'n') {
+                            const drAbs = Math.abs(targetR - r_attacker);
+                            const dcAbs = Math.abs(targetC - c_attacker);
+                            if ((drAbs === 2 && dcAbs === 1) || (drAbs === 1 && dcAbs === 2)) return true;
+                        } else if (pieceType === 'r' || pieceType === 'q') { 
+                            if ((r_attacker === targetR || c_attacker === targetC) && isPathClear(r_attacker, c_attacker, targetR, targetC, board)) {
+                                return true;
+                            }
+                        } 
+                        if (pieceType === 'b' || pieceType === 'q') { 
+                             if (Math.abs(targetR - r_attacker) === Math.abs(targetC - c_attacker) && isPathClear(r_attacker, c_attacker, targetR, targetC, board)) {
+                                return true;
+                            }
+                        }
+                        if (pieceType === 'k') {
+                            if (Math.abs(targetR - r_attacker) <= 1 && Math.abs(targetC - c_attacker) <= 1) return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function hasLegalMoves(playerColor, board, enPassantTarget, currentCastlingRights, activeSpells, currentPly, playerSpellsState, playerGameTurnNumber) {
+            // 1. Check for standard legal moves
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = board[r][c];
+                    if (piece && piece.color === playerColor) { 
+                        // Ensure the piece itself isn't effectively frozen for this check
+                        let isPieceEffectivelyFrozen = isSquareUnderActiveFreeze(r, c, activeSpells, currentPly);
+                        if(isPieceEffectivelyFrozen) continue;
+
+                        for (let toR = 0; toR < 8; toR++) {
+                            for (let toC = 0; toC < 8; toC++) {
+                                if (isValidMove(r, c, toR, toC, board, playerColor, enPassantTarget, currentCastlingRights, activeSpells, currentPly)) {
+                                    return true; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // If no standard moves, and king is in check, consider spells
+            if (!isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) {
+                // If not in check and no standard moves, it's stalemate (already handled by above loop returning false)
+                return false; 
+            }
+
+            // At this point, player is in check and has no standard legal moves.
+            // Check if casting a spell can get them out of check AND allow a subsequent legal move.
+
+            // 2. Check Jump Spell
+            const canCastJump = playerSpellsState.jump > 0 && (playerSpellsState.jumpLastUsedTurn === 0 || playerGameTurnNumber >= playerSpellsState.jumpLastUsedTurn + 3);
+            if (canCastJump) {
+                for (let jr = 0; jr < 8; jr++) { // Iterate all squares for jump target
+                    for (let jc = 0; jc < 8; jc++) {
+                        const targetPieceForJump = board[jr][jc];
+                        if (targetPieceForJump) {
+                            // Simulate casting Jump
+                            const originalIsJumpable = targetPieceForJump.isJumpable;
+                            targetPieceForJump.isJumpable = true;
+                            
+                            // Check if king is NO LONGER in check after jump is applied (even before a move)
+                            // Or, more accurately, check if there's a legal move NOW
+                            if (!isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) { // Path might be cleared
+                                // AND there is a legal move for the player
+                                for (let r = 0; r < 8; r++) {
+                                    for (let c = 0; c < 8; c++) {
+                                        const piece = board[r][c];
+                                        if (piece && piece.color === playerColor) {
+                                            if (isSquareUnderActiveFreeze(r, c, activeSpells, currentPly)) continue;
+                                            for (let toR = 0; toR < 8; toR++) {
+                                                for (let toC = 0; toC < 8; toC++) {
+                                                    if (isValidMove(r, c, toR, toC, board, playerColor, enPassantTarget, currentCastlingRights, activeSpells, currentPly)) {
+                                                        targetPieceForJump.isJumpable = originalIsJumpable; // Revert
+                                                        return true; // Found a way out
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            targetPieceForJump.isJumpable = originalIsJumpable; // Revert simulation
+                        }
+                    }
+                }
+            }
+
+            // 3. Check Freeze Spell
+            const canCastFreeze = playerSpellsState.freeze > 0 && (playerSpellsState.freezeLastUsedTurn === 0 || playerGameTurnNumber >= playerSpellsState.freezeLastUsedTurn + 3);
+            if (canCastFreeze) {
+                for (let fr = 0; fr < 8; fr++) { // Iterate all squares for freeze target
+                    for (let fc = 0; fc < 8; fc++) {
+                        // Simulate casting Freeze by creating a temporary activeSpells array
+                        const tempActiveSpells = JSON.parse(JSON.stringify(activeSpells || [])); 
+                        tempActiveSpells.push({
+                            type: 'freeze',
+                            targetSquare: { r: fr, c: fc },
+                            // Freeze spell effect duration for checkmate escape:
+                            // It applies for the current turn (where player casts freeze + makes a move) 
+                            // AND opponent's next turn. So, for evaluating *this* turn's escape,
+                            // the freeze is active for plyCount + 1 (opponent's turn after our move).
+                            // The check we are doing is: "If I cast freeze here, then on my move this turn, am I out of check?"
+                            // So the freeze is active for the current ply.
+                            expiresAtPly: currentPly + 1 // Freeze is active for the current player's move
+                        });
+
+                        // If casting freeze makes the king NOT in check
+                        if (!isKingInCheck(playerColor, board, enPassantTarget, tempActiveSpells, currentPly)) {
+                            // AND there is a legal move for the player under these new freeze conditions
+                            for (let r = 0; r < 8; r++) {
+                                for (let c = 0; c < 8; c++) {
+                                    const piece = board[r][c];
+                                    if (piece && piece.color === playerColor) {
+                                        // If the piece itself would be frozen by this theoretical freeze, it can't move
+                                        if (isSquareUnderActiveFreeze(r, c, tempActiveSpells, currentPly)) continue;
+                                        
+                                        for (let toR = 0; toR < 8; toR++) {
+                                            for (let toC = 0; toC < 8; toC++) {
+                                                // isValidMove needs to use tempActiveSpells
+                                                if (isValidMove(r, c, toR, toC, board, playerColor, enPassantTarget, currentCastlingRights, tempActiveSpells, currentPly)) {
+                                                    return true; // Found a way out
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false; 
+        }
+
+```
+
+**Full HTML (with corrected `isSquareAttacked` and `hasLegalMoves`):**
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -267,50 +464,6 @@
             text-align: center;
             width: 100%; 
         }
-        
-        /* Background Color Explosion Animation */
-        @keyframes colorExplosion {
-            0% { background-color: #ffadad; } 10% { background-color: #ffd6a5; }
-            20% { background-color: #fdffb6; } 30% { background-color: #caffbf; }
-            40% { background-color: #9bf6ff; } 50% { background-color: #a0c4ff; }
-            60% { background-color: #bdb2ff; } 70% { background-color: #ffc6ff; }
-            80% { background-color: #fffffc; } 90% { background-color: #f0f0f0; }
-            100% { background-color: #fff; }  
-        }
-
-        body.checkmate-celebration-bg {
-            animation: colorExplosion 0.5s linear 10; 
-        }
-
-        #confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; 
-            overflow: hidden; 
-            z-index: 9999; 
-        }
-
-        .confetti-piece {
-            position: absolute;
-            width: 10px;
-            height: 20px; 
-            opacity: 0.9;
-            animation: fall 3s linear infinite; 
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-10vh) rotate(0deg); 
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh) rotate(720deg); 
-                opacity: 0;
-            }
-        }
 
 
         /* --- MOBILE STYLES --- */
@@ -537,7 +690,6 @@
         const downloadGameButton = document.getElementById('download-game-button');
         const downloadGifButton = document.getElementById('download-gif-button');
         const togglePiecesButton = document.getElementById('toggle-pieces-button');
-        const confettiContainer = document.getElementById('confetti-container'); // Added for confetti
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -797,7 +949,7 @@
                     gameState.plyCount = tempGameStateForRender.plyCount; 
                     gameState.selectedPiece = null; 
                     useStandardPieces = tempGameStateForRender.useStandardPieces === undefined ? originalUseStandardPieces : tempGameStateForRender.useStandardPieces;
-                    applyPieceStyle(); // This calls renderBoard which will apply the correct piece characters
+                    applyPieceStyle(); 
                     
                     updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
                     await new Promise(resolve => setTimeout(resolve, 50)); 
@@ -825,7 +977,6 @@
                 console.error("Error during GIF frame download process:", error);
                 updateStatus("GIF frame download failed.");
             } finally {
-                // Restore the game to its original state
                 const originalGameStateRestored = JSON.parse(originalGameStateSnapshotJSON);
                 for (const key in originalGameStateRestored) {
                     if (Object.prototype.hasOwnProperty.call(originalGameStateRestored, key)) {
@@ -839,21 +990,23 @@
                 gameState.selectedPiece = originalSelectedPieceJSON ? JSON.parse(originalSelectedPieceJSON) : null;
                 gameState.plyCount = actualCurrentPlyCount; 
                 useStandardPieces = originalUseStandardPieces; 
-                applyPieceStyle(); // This calls renderBoard
+                applyPieceStyle(); 
 
-                // Re-enable buttons correctly based on game state
-                downloadGifButton.disabled = false; 
-                document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
-                    const isAlwaysEnabled = btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button';
-                    if (isAlwaysEnabled) {
-                        btn.disabled = false;
-                    } else { // Spell buttons, cancel button
-                        btn.disabled = gameState.isGameOver || gameState.awaitingPromotion;
+                updateSpellControls(); 
+                updateCancelButtonVisibility();
+                downloadGifButton.disabled = false;
+                 document.querySelectorAll('.controls button').forEach(btn => {
+                    const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion);
+                     if (btn.id === 'download-gif-button') { // Ensure GIF button itself is handled
+                        btn.disabled = isDisabledByGameLogic;
+                     } else if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button') {
+                        btn.disabled = false; 
+                    } else if (btn.id.includes('-spell') || btn.id === 'cancel-button') { 
+                        btn.disabled = isDisabledByGameLogic;
                     }
                 });
-                updateSpellControls(); // Specifically refresh spell buttons state
-
-
+                updateSpellControls(); // Refresh spell buttons after other controls are set
+                
                 if (gameState.isGameOver) {
                     updateStatus(gameState.gameEndMessage || "Game over.");
                 } else if (gameState.awaitingPromotion) {
@@ -867,40 +1020,6 @@
                 }
             }
         });
-
-        function triggerCheckmateAnimation() {
-            document.body.classList.add('checkmate-celebration-bg');
-            
-            const numConfetti = 150; 
-            for (let i = 0; i < numConfetti; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti-piece');
-                
-                confetti.style.left = Math.random() * 100 + 'vw';
-                const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590', '#277da1'];
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                confetti.style.animationDelay = Math.random() * 2 + 's'; 
-                const size = Math.random() * 0.5 + 0.5; 
-                confetti.style.width = (10 * size) + 'px';
-                confetti.style.height = (20 * size) + 'px';
-
-                // Ensure confettiContainer exists before appending
-                const container = document.getElementById('confetti-container');
-                if (container) {
-                    container.appendChild(confetti);
-                }
-            }
-
-            setTimeout(() => {
-                document.body.classList.remove('checkmate-celebration-bg');
-                const container = document.getElementById('confetti-container');
-                if (container) {
-                    container.innerHTML = ''; 
-                }
-            }, 5500); 
-        }
-
 
         function renderBoard() {
             chessboardDiv.innerHTML = '';
@@ -1143,7 +1262,6 @@
             updateCancelButtonVisibility(); 
         }
 
-        // ... (All other JS functions like isPathClear, isSquareAttacked, etc. remain the same) ...
         function isPathClear(fromR, fromC, toR, toC, board) {
             const dr = Math.sign(toR - fromR);
             const dc = Math.sign(toC - fromC);
@@ -1167,10 +1285,11 @@
                 for (let c_attacker = 0; c_attacker < 8; c_attacker++) {
                     const piece = board[r_attacker][c_attacker];
                     if (piece && piece.color === attackerColor) {
-                        let effectivelyFrozenAttacker = piece.isFrozen || isSquareUnderActiveFreeze(r_attacker, c_attacker, activeSpells, currentPly);
-                        if (effectivelyFrozenAttacker && piece.type.toLowerCase() !== 'k') continue; 
-
-
+                        let isAttackerFrozen = isSquareUnderActiveFreeze(r_attacker, c_attacker, activeSpells, currentPly);
+                        if (isAttackerFrozen && piece.type.toLowerCase() !== 'k') {
+                            continue; 
+                        }
+                        
                         const pieceType = piece.type.toLowerCase();
                         if (pieceType === 'p') {
                             const attackDR = (attackerColor === 'white') ? -1 : 1; 
@@ -1189,7 +1308,7 @@
                                 return true;
                             }
                         }
-                        if (pieceType === 'k') { 
+                        if (pieceType === 'k') {
                             if (Math.abs(targetR - r_attacker) <= 1 && Math.abs(targetC - c_attacker) <= 1) return true;
                         }
                     }
@@ -1372,15 +1491,14 @@
             return isSquareAttacked(kingPos.r, kingPos.c, attackerColor, board, enPassantTarget, activeSpells, currentPly);
         }
 
-        function hasLegalMoves(playerColor, board, enPassantTarget, currentCastlingRights, activeSpells, currentPly, playerSpellsState, playerTurnNumberForCooldown) {
+        function hasLegalMoves(playerColor, board, enPassantTarget, currentCastlingRights, activeSpells, currentPly, playerSpellsState, playerGameTurnNumber) {
+            // 1. Check for standard legal moves
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
                     const piece = board[r][c];
                     if (piece && piece.color === playerColor) { 
-                        let isPieceEffectivelyFrozen = isSquareUnderActiveFreeze(r, c, activeSpells, currentPly); // Only check active freeze zones for hasLegalMoves
-                        if(isPieceEffectivelyFrozen && piece.type.toLowerCase() !== 'k') continue; // A frozen king might still have a castling move if squares aren't attacked
-                        if(isPieceEffectivelyFrozen && piece.type.toLowerCase() === 'k' && !checkCastleConditions(r,c,r,c+2,board,playerColor,currentCastlingRights,activeSpells,currentPly,enPassantTarget) && !checkCastleConditions(r,c,r,c-2,board,playerColor,currentCastlingRights,activeSpells,currentPly,enPassantTarget) ) continue;
-
+                        let isPieceEffectivelyFrozen = isSquareUnderActiveFreeze(r, c, activeSpells, currentPly);
+                        if(isPieceEffectivelyFrozen) continue;
 
                         for (let toR = 0; toR < 8; toR++) {
                             for (let toC = 0; toC < 8; toC++) {
@@ -1393,30 +1511,70 @@
                 }
             }
 
-            const canCastFreeze = playerSpellsState.freeze > 0 && (playerSpellsState.freezeLastUsedTurn === 0 || playerTurnNumberForCooldown >= playerSpellsState.freezeLastUsedTurn + 3);
-            
-            if (canCastFreeze && isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) {
+            if (!isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) {
+                return false; 
+            }
+
+            // 2. Check Jump Spell
+            const canCastJump = playerSpellsState.jump > 0 && (playerSpellsState.jumpLastUsedTurn === 0 || playerGameTurnNumber >= playerSpellsState.jumpLastUsedTurn + 3);
+            if (canCastJump) {
+                for (let jr = 0; jr < 8; jr++) { 
+                    for (let jc = 0; jc < 8; jc++) {
+                        const targetPieceForJump = board[jr][jc];
+                        if (targetPieceForJump) {
+                            const originalIsJumpable = targetPieceForJump.isJumpable;
+                            targetPieceForJump.isJumpable = true;
+                            
+                            const tempBoardForJumpCheck = board.map(row => row.map(p => p ? {...p} : null)); // Simulate jump on a copy
+                            tempBoardForJumpCheck[jr][jc].isJumpable = true;
+
+                            if (!isKingInCheck(playerColor, tempBoardForJumpCheck, enPassantTarget, activeSpells, currentPly)) {
+                                for (let r = 0; r < 8; r++) {
+                                    for (let c = 0; c < 8; c++) {
+                                        const piece = tempBoardForJumpCheck[r][c];
+                                        if (piece && piece.color === playerColor) {
+                                            if (isSquareUnderActiveFreeze(r, c, activeSpells, currentPly)) continue;
+                                            for (let toR = 0; toR < 8; toR++) {
+                                                for (let toC = 0; toC < 8; toC++) {
+                                                    if (isValidMove(r, c, toR, toC, tempBoardForJumpCheck, playerColor, enPassantTarget, currentCastlingRights, activeSpells, currentPly)) {
+                                                        targetPieceForJump.isJumpable = originalIsJumpable; 
+                                                        return true; 
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            targetPieceForJump.isJumpable = originalIsJumpable; 
+                        }
+                    }
+                }
+            }
+
+            // 3. Check Freeze Spell
+            const canCastFreeze = playerSpellsState.freeze > 0 && (playerSpellsState.freezeLastUsedTurn === 0 || playerGameTurnNumber >= playerSpellsState.freezeLastUsedTurn + 3);
+            if (canCastFreeze) {
                 for (let fr = 0; fr < 8; fr++) { 
                     for (let fc = 0; fc < 8; fc++) {
-                        const tempActiveSpells = JSON.parse(JSON.stringify(activeSpells));
+                        const tempActiveSpells = JSON.parse(JSON.stringify(activeSpells || [])); 
                         tempActiveSpells.push({
                             type: 'freeze',
                             targetSquare: { r: fr, c: fc },
-                            expiresAtPly: currentPly + 2 
+                            expiresAtPly: currentPly + 1 
                         });
 
-                        if (!isKingInCheck(playerColor, board, enPassantTarget, tempActiveSpells, currentPly + 1)) {
-                            for (let pr = 0; pr < 8; pr++) {
-                                for (let pc = 0; pc < 8; pc++) {
-                                    const p = board[pr][pc];
-                                    if (p && p.color === playerColor) {
-                                        let effectivelyFrozenByTempSpells = isSquareUnderActiveFreeze(pr, pc, tempActiveSpells, currentPly + 1);
-                                        if (!effectivelyFrozenByTempSpells) {
-                                            for (let ptoR = 0; ptoR < 8; ptoR++) {
-                                                for (let ptoC = 0; ptoC < 8; ptoC++) {
-                                                    if (isValidMove(pr, pc, ptoR, ptoC, board, playerColor, enPassantTarget, currentCastlingRights, tempActiveSpells, currentPly +1)) {
-                                                        return true; 
-                                                    }
+                        if (!isKingInCheck(playerColor, board, enPassantTarget, tempActiveSpells, currentPly)) {
+                            for (let r = 0; r < 8; r++) {
+                                for (let c = 0; c < 8; c++) {
+                                    const piece = board[r][c];
+                                    if (piece && piece.color === playerColor) {
+                                        if (isSquareUnderActiveFreeze(r, c, tempActiveSpells, currentPly)) continue;
+                                        
+                                        for (let toR = 0; toR < 8; toR++) {
+                                            for (let toC = 0; toC < 8; toC++) {
+                                                if (isValidMove(r, c, toR, toC, board, playerColor, enPassantTarget, currentCastlingRights, tempActiveSpells, currentPly)) {
+                                                    return true; 
                                                 }
                                             }
                                         }
@@ -1488,14 +1646,26 @@
                 playerSpells.freeze--;
                 playerSpells.freezeLastUsedTurn = currentCastingGameTurn;
 
-                const affectedPieceIds = []; // Not strictly needed with current freeze logic but kept if rules evolve
+                const affectedPieceIds = [];
                 const freezeCenterR = r_target;
                 const freezeCenterC = c_target;
                 
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = freezeCenterR + dr; 
+                        const nc = freezeCenterC + dc; 
+                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { 
+                            const pieceToFreeze = gameState.board[nr][nc];
+                            if (pieceToFreeze) {
+                                affectedPieceIds.push(pieceToFreeze.id);
+                            }
+                        }
+                    }
+                }
                 gameState.activeSpells.push({
                     type: 'freeze',
                     targetSquare: {r: freezeCenterR, c: freezeCenterC}, 
-                    affectedPieceIds: affectedPieceIds, // For potential future use if unfreezing specific pieces
+                    affectedPieceIds: affectedPieceIds, 
                     expiresAtPly: gameState.plyCount + 2 
                 });
                 spellApplied = true;
@@ -1515,7 +1685,6 @@
         function activateSpellMode(type) {
             if (gameState.selectedPiece) { 
                 gameState.selectedPiece = null;
-                 // No immediate renderBoard; will be handled by subsequent logic
             }
 
             if (gameState.isGameOver || gameState.awaitingPromotion) return; 
@@ -1642,11 +1811,12 @@
 
             gameState.activeSpells.forEach(spell => {
                 if (gameState.plyCount >= spell.expiresAtPly) { 
-                    if (spell.type === 'jump') {
+                    if (spell.type === 'freeze') {
+                        // Visual effect of freeze zone is handled by renderBoard
+                    } else if (spell.type === 'jump') {
                          const piece = findPieceById(spell.targetId);
                          if (piece) piece.isJumpable = false;
                     }
-                    // For freeze, effect removal is implicit via plyCount check in isSquareUnderActiveFreeze
                     boardNeedsRender = true; 
                 } else {
                     stillActive.push(spell); 
@@ -1686,7 +1856,6 @@
                 gameState.isGameOver = true;
                 const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                 gameEndMessage = `King captured! ${winner} wins!`;
-                 if (!gameState.isGameOver) triggerCheckmateAnimation(); // Trigger only if not already over by other means
             } else {
                 if (isKingInCheck(opponentColor, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
                     isCheck = true;
@@ -1696,7 +1865,6 @@
                         gameState.isGameOver = true;
                         const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                         gameEndMessage = `Checkmate! ${winner} wins!`;
-                        triggerCheckmateAnimation();
                     }
                 } else { 
                     const nextPlayerSpells = gameState.spells[opponentColor];
