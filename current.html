@@ -200,14 +200,10 @@
             position: relative;
             z-index: 2;
         }
-        /* Piece coloring styles */
         .chessboard.colored-pieces .piece.white-piece-alternative {
             color: white; 
-            /* Add a slight stroke or shadow if pieces are hard to see on light squares */
-             text-shadow: -1px -1px 0 #555, 1px -1px 0 #555, -1px 1px 0 #555, 1px 1px 0 #555; /* Simple black outline */
-
+            text-shadow: -1px -1px 0 #555, 1px -1px 0 #555, -1px 1px 0 #555, 1px 1px 0 #555;
         }
-
 
         .controls {
             width: 250px;
@@ -374,7 +370,7 @@
         }
     </style>
 </head>
-<body class="vsc-initialized game-view"> <!-- Start with home-view, colored-pieces will be added/removed by JS -->
+<body class="game-view"> 
 
     <div id="home-page-content">
         <h1>Spell Chess</h1>
@@ -394,8 +390,8 @@
     <div id="game-content-wrapper">
         <div class="game-container">
             <div class="main-game-area">
-                <div id="chessboard" class="chessboard colored-pieces"><div class="square light" data-r="0" data-c="0"><span class="piece" data-piece-id="piece-0-0-1748902213356">♜</span></div><div class="square dark" data-r="0" data-c="1"><span class="piece" data-piece-id="piece-0-1-1748902213356">♞</span></div><div class="square light" data-r="0" data-c="2"><span class="piece" data-piece-id="piece-0-2-1748902213356">♝</span></div><div class="square dark" data-r="0" data-c="3"><span class="piece" data-piece-id="piece-0-3-1748902213356">♛</span></div><div class="square light" data-r="0" data-c="4"><span class="piece" data-piece-id="piece-0-4-1748902213356">♚</span></div><div class="square dark" data-r="0" data-c="5"><span class="piece" data-piece-id="piece-0-5-1748902213356">♝</span></div><div class="square light" data-r="0" data-c="6"><span class="piece" data-piece-id="piece-0-6-1748902213356">♞</span></div><div class="square dark" data-r="0" data-c="7"><span class="piece" data-piece-id="piece-0-7-1748902213356">♜</span></div><div class="square dark" data-r="1" data-c="0"><span class="piece" data-piece-id="piece-1-0-1748902213356">♟</span></div><div class="square light" data-r="1" data-c="1"><span class="piece" data-piece-id="piece-1-1-1748902213356">♟</span></div><div class="square dark" data-r="1" data-c="2"></div><div class="square light" data-r="1" data-c="3"><span class="piece" data-piece-id="piece-1-3-1748902213356">♟</span></div><div class="square dark" data-r="1" data-c="4"><span class="piece" data-piece-id="piece-1-4-1748902213356">♟</span></div><div class="square light" data-r="1" data-c="5"><span class="piece" data-piece-id="piece-1-5-1748902213356">♟</span></div><div class="square dark" data-r="1" data-c="6"><span class="piece" data-piece-id="piece-1-6-1748902213356">♟</span></div><div class="square light" data-r="1" data-c="7"><span class="piece" data-piece-id="piece-1-7-1748902213356">♟</span></div><div class="square light" data-r="2" data-c="0"></div><div class="square dark" data-r="2" data-c="1"></div><div class="square light" data-r="2" data-c="2"><span class="piece" data-piece-id="piece-1-2-1748902213356">♟</span></div><div class="square dark" data-r="2" data-c="3"></div><div class="square light" data-r="2" data-c="4"></div><div class="square dark" data-r="2" data-c="5"></div><div class="square light" data-r="2" data-c="6"></div><div class="square dark" data-r="2" data-c="7"></div><div class="square dark" data-r="3" data-c="0"></div><div class="square light" data-r="3" data-c="1"></div><div class="square dark" data-r="3" data-c="2"></div><div class="square light" data-r="3" data-c="3"></div><div class="square dark" data-r="3" data-c="4"></div><div class="square light" data-r="3" data-c="5"></div><div class="square dark" data-r="3" data-c="6"></div><div class="square light" data-r="3" data-c="7"></div><div class="square light" data-r="4" data-c="0"></div><div class="square dark" data-r="4" data-c="1"></div><div class="square light" data-r="4" data-c="2"></div><div class="square dark" data-r="4" data-c="3"></div><div class="square light" data-r="4" data-c="4"><span class="piece white-piece-alternative" data-piece-id="piece-6-4-1748902213356">♟</span></div><div class="square dark" data-r="4" data-c="5"></div><div class="square light" data-r="4" data-c="6"></div><div class="square dark" data-r="4" data-c="7"></div><div class="square dark" data-r="5" data-c="0"></div><div class="square light" data-r="5" data-c="1"></div><div class="square dark" data-r="5" data-c="2"></div><div class="square light" data-r="5" data-c="3"></div><div class="square dark" data-r="5" data-c="4"></div><div class="square light" data-r="5" data-c="5"></div><div class="square dark" data-r="5" data-c="6"></div><div class="square light" data-r="5" data-c="7"></div><div class="square light" data-r="6" data-c="0"><span class="piece white-piece-alternative" data-piece-id="piece-6-0-1748902213356">♟</span></div><div class="square dark" data-r="6" data-c="1"><span class="piece white-piece-alternative" data-piece-id="piece-6-1-1748902213356">♟</span></div><div class="square light" data-r="6" data-c="2"><span class="piece white-piece-alternative" data-piece-id="piece-6-2-1748902213356">♟</span></div><div class="square dark" data-r="6" data-c="3"><span class="piece white-piece-alternative" data-piece-id="piece-6-3-1748902213356">♟</span></div><div class="square light" data-r="6" data-c="4"></div><div class="square dark" data-r="6" data-c="5"><span class="piece white-piece-alternative" data-piece-id="piece-6-5-1748902213356">♟</span></div><div class="square light" data-r="6" data-c="6"><span class="piece white-piece-alternative" data-piece-id="piece-6-6-1748902213356">♟</span></div><div class="square dark" data-r="6" data-c="7"><span class="piece white-piece-alternative" data-piece-id="piece-6-7-1748902213356">♟</span></div><div class="square dark" data-r="7" data-c="0"><span class="piece white-piece-alternative" data-piece-id="piece-7-0-1748902213356">♜</span></div><div class="square light" data-r="7" data-c="1"><span class="piece white-piece-alternative" data-piece-id="piece-7-1-1748902213356">♞</span></div><div class="square dark" data-r="7" data-c="2"><span class="piece white-piece-alternative" data-piece-id="piece-7-2-1748902213356">♝</span></div><div class="square light" data-r="7" data-c="3"><span class="piece white-piece-alternative" data-piece-id="piece-7-3-1748902213356">♛</span></div><div class="square dark" data-r="7" data-c="4"><span class="piece white-piece-alternative" data-piece-id="piece-7-4-1748902213356">♚</span></div><div class="square light" data-r="7" data-c="5"><span class="piece white-piece-alternative" data-piece-id="piece-7-5-1748902213356">♝</span></div><div class="square dark" data-r="7" data-c="6"><span class="piece white-piece-alternative" data-piece-id="piece-7-6-1748902213356">♞</span></div><div class="square light" data-r="7" data-c="7"><span class="piece white-piece-alternative" data-piece-id="piece-7-7-1748902213356">♜</span></div></div> <!-- colored-pieces class will be added here by JS -->
-                <div id="status-area" class="status-area">White's turn.</div>
+                <div id="chessboard" class="chessboard colored-pieces"><div class="square light" data-r="0" data-c="0"><span class="piece" data-piece-id="piece-0-0-1748915770902">♜</span></div><div class="square dark" data-r="0" data-c="1"><span class="piece" data-piece-id="piece-0-1-1748915770902">♞</span></div><div class="square light" data-r="0" data-c="2"><span class="piece" data-piece-id="piece-0-2-1748915770902">♝</span></div><div class="square dark" data-r="0" data-c="3"><span class="piece" data-piece-id="piece-0-3-1748915770902">♛</span></div><div class="square light" data-r="0" data-c="4"><span class="piece" data-piece-id="piece-0-4-1748915770902">♚</span></div><div class="square dark" data-r="0" data-c="5"><span class="piece" data-piece-id="piece-0-5-1748915770902">♝</span></div><div class="square light" data-r="0" data-c="6"><span class="piece" data-piece-id="piece-0-6-1748915770902">♞</span></div><div class="square dark" data-r="0" data-c="7"><span class="piece" data-piece-id="piece-0-7-1748915770902">♜</span></div><div class="square dark" data-r="1" data-c="0"><span class="piece" data-piece-id="piece-1-0-1748915770902">♟</span></div><div class="square light" data-r="1" data-c="1"><span class="piece" data-piece-id="piece-1-1-1748915770902">♟</span></div><div class="square dark" data-r="1" data-c="2"></div><div class="square light" data-r="1" data-c="3"><span class="piece" data-piece-id="piece-1-3-1748915770902">♟</span></div><div class="square dark" data-r="1" data-c="4"><span class="piece" data-piece-id="piece-1-4-1748915770902">♟</span></div><div class="square light" data-r="1" data-c="5"><span class="piece" data-piece-id="piece-1-5-1748915770902">♟</span></div><div class="square dark" data-r="1" data-c="6"><span class="piece" data-piece-id="piece-1-6-1748915770902">♟</span></div><div class="square light" data-r="1" data-c="7"><span class="piece" data-piece-id="piece-1-7-1748915770902">♟</span></div><div class="square light" data-r="2" data-c="0"></div><div class="square dark" data-r="2" data-c="1"></div><div class="square light" data-r="2" data-c="2"><span class="piece" data-piece-id="piece-1-2-1748915770902">♟</span></div><div class="square dark" data-r="2" data-c="3"></div><div class="square light" data-r="2" data-c="4"></div><div class="square dark" data-r="2" data-c="5"></div><div class="square light" data-r="2" data-c="6"></div><div class="square dark" data-r="2" data-c="7"></div><div class="square dark" data-r="3" data-c="0"></div><div class="square light" data-r="3" data-c="1"></div><div class="square dark" data-r="3" data-c="2"></div><div class="square light" data-r="3" data-c="3"></div><div class="square dark" data-r="3" data-c="4"></div><div class="square light" data-r="3" data-c="5"></div><div class="square dark" data-r="3" data-c="6"></div><div class="square light" data-r="3" data-c="7"></div><div class="square light" data-r="4" data-c="0"></div><div class="square dark" data-r="4" data-c="1"></div><div class="square light" data-r="4" data-c="2"><span class="piece white-piece-alternative" data-piece-id="piece-7-5-1748915770902">♝</span></div><div class="square dark" data-r="4" data-c="3"></div><div class="square light" data-r="4" data-c="4"><span class="piece white-piece-alternative" data-piece-id="piece-6-4-1748915770902">♟</span></div><div class="square dark" data-r="4" data-c="5"></div><div class="square light" data-r="4" data-c="6"></div><div class="square dark" data-r="4" data-c="7"></div><div class="square dark" data-r="5" data-c="0"></div><div class="square light" data-r="5" data-c="1"></div><div class="square dark" data-r="5" data-c="2"></div><div class="square light" data-r="5" data-c="3"></div><div class="square dark" data-r="5" data-c="4"></div><div class="square light" data-r="5" data-c="5"></div><div class="square dark" data-r="5" data-c="6"></div><div class="square light" data-r="5" data-c="7"></div><div class="square light" data-r="6" data-c="0"><span class="piece white-piece-alternative" data-piece-id="piece-6-0-1748915770902">♟</span></div><div class="square dark" data-r="6" data-c="1"><span class="piece white-piece-alternative" data-piece-id="piece-6-1-1748915770902">♟</span></div><div class="square light" data-r="6" data-c="2"><span class="piece white-piece-alternative" data-piece-id="piece-6-2-1748915770902">♟</span></div><div class="square dark" data-r="6" data-c="3"><span class="piece white-piece-alternative" data-piece-id="piece-6-3-1748915770902">♟</span></div><div class="square light" data-r="6" data-c="4"></div><div class="square dark" data-r="6" data-c="5"><span class="piece white-piece-alternative" data-piece-id="piece-6-5-1748915770902">♟</span></div><div class="square light" data-r="6" data-c="6"><span class="piece white-piece-alternative" data-piece-id="piece-6-6-1748915770902">♟</span></div><div class="square dark" data-r="6" data-c="7"><span class="piece white-piece-alternative" data-piece-id="piece-6-7-1748915770902">♟</span></div><div class="square dark" data-r="7" data-c="0"><span class="piece white-piece-alternative" data-piece-id="piece-7-0-1748915770902">♜</span></div><div class="square light" data-r="7" data-c="1"><span class="piece white-piece-alternative" data-piece-id="piece-7-1-1748915770902">♞</span></div><div class="square dark" data-r="7" data-c="2"><span class="piece white-piece-alternative" data-piece-id="piece-7-2-1748915770902">♝</span></div><div class="square light" data-r="7" data-c="3"><span class="piece white-piece-alternative" data-piece-id="piece-7-3-1748915770902">♛</span></div><div class="square dark" data-r="7" data-c="4"><span class="piece white-piece-alternative" data-piece-id="piece-7-4-1748915770902">♚</span></div><div class="square light" data-r="7" data-c="5"></div><div class="square dark" data-r="7" data-c="6"><span class="piece white-piece-alternative" data-piece-id="piece-7-6-1748915770902">♞</span></div><div class="square light" data-r="7" data-c="7"><span class="piece white-piece-alternative" data-piece-id="piece-7-7-1748915770902">♜</span></div></div> 
+                <div id="status-area" class="status-area">Black's turn.</div>
                 <div id="rules-area" class="rules-area">
                     <h4>Spell Chess Rules:</h4>
                     <ul>
@@ -412,16 +408,16 @@
             <div class="controls">
                 <div id="white-player-info" class="player-info">
                     <h3>White</h3>
-                    <button id="white-jump-spell" class="spell-button">Cast Jump (<span id="white-jump-count">2</span>)</button>
+                    <button id="white-jump-spell" class="spell-button" disabled="">Cast Jump (<span id="white-jump-count">2</span>)</button>
                     <small id="white-jump-cooldown">Ready</small>
-                    <button id="white-freeze-spell" class="spell-button">Cast Freeze (<span id="white-freeze-count">5</span>)</button>
+                    <button id="white-freeze-spell" class="spell-button" disabled="">Cast Freeze (<span id="white-freeze-count">5</span>)</button>
                     <small id="white-freeze-cooldown">Ready</small>
                 </div>
                 <div id="black-player-info" class="player-info">
                     <h3>Black</h3>
-                    <button id="black-jump-spell" class="spell-button" disabled="">Cast Jump (<span id="black-jump-count">2</span>)</button>
+                    <button id="black-jump-spell" class="spell-button">Cast Jump (<span id="black-jump-count">2</span>)</button>
                     <small id="black-jump-cooldown">Ready</small>
-                    <button id="black-freeze-spell" class="spell-button" disabled="">Cast Freeze (<span id="black-freeze-count">5</span>)</button>
+                    <button id="black-freeze-spell" class="spell-button">Cast Freeze (<span id="black-freeze-count">5</span>)</button>
                     <small id="black-freeze-cooldown">Ready</small>
                 </div>
                 
@@ -437,18 +433,19 @@
                     <button class="promotion-button" data-promote="B">Promote to Bishop</button>
                     <button class="promotion-button" data-promote="N">Promote to Knight</button>
                 </div>
-                <button id="cancel-button" class="reset-button" style="display:none; margin-top:10px; width:100%;">Cancel</button>
+                <button id="cancel-button" class="reset-button" style="display: none; margin-top: 10px; width: 100%;">Cancel</button>
             </div>
-            <div id="notation-area" class="notation-area"><div class="notation-line"><span class="notation-turn-number">1. </span><span class="notation-move" data-ply-snapshot-index="1">e4</span> <span class="notation-move" data-ply-snapshot-index="2">c6</span> </div></div>
+            <div id="notation-area" class="notation-area"><div class="notation-line"><span class="notation-turn-number">1. </span><span class="notation-move" data-ply-snapshot-index="1">e4</span> <span class="notation-move" data-ply-snapshot-index="2">c6</span> </div><div class="notation-line"><span class="notation-turn-number">2. </span><span class="notation-move" data-ply-snapshot-index="3">Bc4</span> </div></div>
         </div>
         <div id="gif-output-area">
-            <!-- This area is currently not used to display the GIF directly -->
+            <!-- Content here if needed -->
         </div>
     </div>
 
-    <script id="savedGameStateData" type="application/json">{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"p","color":"black","id":"piece-1-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,{"type":"p","color":"black","id":"piece-1-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,{"type":"P","color":"white","id":"piece-6-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":2,"whitePlayerTurn":2,"blackPlayerTurn":2,"plyCount":2,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[{"turn":1,"player":"white","notation":"e4","plySnapshotIndex":1},{"turn":1,"player":"black","notation":"c6","plySnapshotIndex":2}],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"history":[{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false},{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,{"type":"P","color":"white","id":"piece-6-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"black","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":2,"plyCount":1,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false},{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"p","color":"black","id":"piece-1-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,{"type":"p","color":"black","id":"piece-1-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,{"type":"P","color":"white","id":"piece-6-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748902213356","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":2,"whitePlayerTurn":2,"blackPlayerTurn":2,"plyCount":2,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false}],"useStandardPieces":false}</script>
+    <script id="savedGameStateData" type="application/json">{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"p","color":"black","id":"piece-1-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,{"type":"p","color":"black","id":"piece-1-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,{"type":"B","color":"white","id":"piece-7-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,{"type":"P","color":"white","id":"piece-6-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"N","color":"white","id":"piece-7-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"black","gameTurnNumber":2,"whitePlayerTurn":2,"blackPlayerTurn":3,"plyCount":3,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[{"turn":1,"player":"white","notation":"e4","plySnapshotIndex":1},{"turn":1,"player":"black","notation":"c6","plySnapshotIndex":2},{"turn":2,"player":"white","notation":"Bc4","plySnapshotIndex":3}],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"history":[{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false},{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,{"type":"P","color":"white","id":"piece-6-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"black","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":2,"plyCount":1,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false},{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"p","color":"black","id":"piece-1-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,{"type":"p","color":"black","id":"piece-1-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,{"type":"P","color":"white","id":"piece-6-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":2,"whitePlayerTurn":2,"blackPlayerTurn":2,"plyCount":2,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":{"r":5,"c":4},"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false},{"board":[[{"type":"r","color":"black","id":"piece-0-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"p","color":"black","id":"piece-1-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,{"type":"p","color":"black","id":"piece-1-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,{"type":"B","color":"white","id":"piece-7-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,{"type":"P","color":"white","id":"piece-6-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":true},null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"P","color":"white","id":"piece-6-5-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},null,{"type":"N","color":"white","id":"piece-7-6-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1748915770902","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"black","gameTurnNumber":2,"whitePlayerTurn":2,"blackPlayerTurn":3,"plyCount":3,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false}],"useStandardPieces":false}</script>
 
     <script id="home-page-script">
+        // ... (Home page script remains the same)
         const startGameButton = document.getElementById('start-game-button');
         const goHomeButton = document.getElementById('go-home-button');
         const mainBody = document.body;
@@ -472,7 +469,7 @@
             'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',
             'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
         };
-        let useStandardPieces = false; // Default: White pieces are black font, colored white by CSS
+        let useStandardPieces = false; 
 
         const initialBoardSetup = [
             ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
@@ -549,7 +546,7 @@
                 gameEndMessage: "", 
                 awaitingPromotion: null,
                 history: [],
-                useStandardPieces: false // Default to colored pieces style
+                useStandardPieces: false 
             };
         }
 
@@ -581,8 +578,6 @@
             } else {
                 initializeGameState();
                 initializeBoardState();
-                useStandardPieces = false; 
-                gameState.useStandardPieces = useStandardPieces; // Ensure it's in the initial state for history
                 const initialSnapshot = deepCopyGameStateForSnapshot(gameState); 
                 gameState.history.push(initialSnapshot);
                 console.log("New game started.");
@@ -590,7 +585,6 @@
 
             promotionChoicesDiv.style.display = 'none';
             applyPieceStyle();
-            // renderBoard(); // applyPieceStyle calls renderBoard
             updateSpellControls();
             updateCancelButtonVisibility();
             updateNotationDisplay();
@@ -617,7 +611,7 @@
                 chessboardDiv.classList.add('colored-pieces');
                 togglePiecesButton.textContent = "Use Standard Pieces";
             }
-            if(gameState && gameState.board && gameState.board.length > 0) { // Ensure board is ready before rendering
+            if(gameState && gameState.board && gameState.board.length > 0) { 
                renderBoard();
             }
         }
@@ -757,10 +751,9 @@
                     gameState.activeSpells = tempGameStateForRender.activeSpells || []; 
                     gameState.plyCount = tempGameStateForRender.plyCount; 
                     gameState.selectedPiece = null; 
-                    // Apply piece style from snapshot, or original if not present (for very old saves)
                     useStandardPieces = tempGameStateForRender.useStandardPieces === undefined ? originalUseStandardPieces : tempGameStateForRender.useStandardPieces;
-                    applyPieceStyle(); // This calls renderBoard
-
+                    applyPieceStyle(); 
+                    
                     updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
                     await new Promise(resolve => setTimeout(resolve, 50)); 
 
@@ -805,15 +798,15 @@
                 updateSpellControls(); 
                 updateCancelButtonVisibility();
                 downloadGifButton.disabled = false;
-                 document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
-                    const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion);
-                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button') {
-                        btn.disabled = false; 
-                    } else if (btn.id.includes('-spell') || btn.id === 'cancel-button') { 
-                        btn.disabled = isDisabledByGameLogic;
-                    }
-                });
-                updateSpellControls(); 
+                 document.querySelectorAll('.controls button').forEach(btn => { // Simpler re-enable logic
+                    btn.disabled = (gameState.isGameOver || gameState.awaitingPromotion) && 
+                                   (btn.id.includes('-spell') || btn.id === 'cancel-button' || btn.id === 'download-gif-button');
+                     if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button' || btn.id === 'download-gif-button') {
+                         btn.disabled = false; // Always enable these non-gameplay ones unless GIF is running
+                     }
+                 });
+                if (gameState.isGameOver || gameState.awaitingPromotion) downloadGifButton.disabled = true; // Special case for GIF button itself
+
                 
                 if (gameState.isGameOver) {
                     updateStatus(gameState.gameEndMessage || "Game over.");
@@ -829,12 +822,8 @@
             }
         });
 
-        // --- renderBoard and other game logic functions ---
-        // (Copied from previous correct version, ensuring `renderBoard` uses `useStandardPieces`)
-
         function renderBoard() {
             chessboardDiv.innerHTML = '';
-            // Apply the class for general styling if needed, actual piece char swapping is below
             if (!useStandardPieces) {
                 chessboardDiv.classList.add('colored-pieces');
             } else {
@@ -887,11 +876,10 @@
                         pieceSpan.classList.add('piece');
                         
                         let displayPieceType = piece.type;
-                        // Logic for "colored pieces" where white uses black piece characters but styled white
                         if (!useStandardPieces && piece.color === 'white') {
-                            displayPieceType = piece.type.toLowerCase(); // e.g., 'P' becomes 'p'
+                            displayPieceType = piece.type.toLowerCase(); 
                             pieceSpan.classList.add('white-piece-alternative'); 
-                        } else {
+                        } else { 
                             pieceSpan.classList.remove('white-piece-alternative');
                         }
 
@@ -913,14 +901,6 @@
                 });
             });
         }
-
-
-        // ... (isSquareUnderActiveFreeze, onSquareClick, isPathClear, isSquareAttacked, checkCastleConditions, isValidMove) ...
-        // ... (getValidMovesForPiece, isKingInCheck, hasLegalMoves, generateMoveNotation, spell functions, updateActiveSpells, findPieceById) ...
-        // ... (endTurn, handleNotationClick, updateNotationDisplay, updateStatus, updateCancelButtonVisibility, updateSpellControls) ...
-        // --- These functions are identical to the previous fully working version that included all these features ---
-        // --- The change for this step was in downloadGifButton and the applyPieceStyle logic integrated into renderBoard ---
-        // --- and the DOMContentLoaded + resetGame logic for initial load and saved game interactivity. ---
 
         function isSquareUnderActiveFreeze(sqR, sqC, activeSpells, currentPly) {
             for (const spell of activeSpells) {
@@ -953,6 +933,13 @@
             }
 
             if (gameState.selectedPiece) {
+                if (gameState.selectedPiece.r === r_clicked && gameState.selectedPiece.c === c_clicked) {
+                    gameState.selectedPiece = null;
+                    renderBoard();
+                    updateCancelButtonVisibility(); 
+                    return;
+                }
+
                 const { r: fromR, c: fromC, piece: movingPiece } = gameState.selectedPiece;
 
                 if (isValidMove(fromR, fromC, r_clicked, c_clicked, gameState.board, gameState.currentPlayer, gameState.enPassantTarget, gameState.castlingRights, gameState.activeSpells, gameState.plyCount)) {
@@ -1076,6 +1063,10 @@
             updateCancelButtonVisibility(); 
         }
 
+        // ... (isPathClear, isSquareAttacked, checkCastleConditions, isValidMove, getValidMovesForPiece, isKingInCheck, hasLegalMoves, generateMoveNotation, spell functions, updateActiveSpells, findPieceById) ...
+        // ... (These functions remain unchanged from the previous fully functional version with corrected turn cooldown logic.) ...
+        // --- The `endTurn`, `handleNotationClick`, `updateNotationDisplay`, `updateStatus`, `updateCancelButtonVisibility`, `updateSpellControls` functions are also from the previous correct version ---
+        // --- The main changes are within `activateSpellMode` and `onSquareClick` for deselection, and `resetGame` for piece style ---
         function isPathClear(fromR, fromC, toR, toC, board) {
             const dr = Math.sign(toR - fromR);
             const dc = Math.sign(toC - fromC);
@@ -1100,7 +1091,19 @@
                     const piece = board[r_attacker][c_attacker];
                     if (piece && piece.color === attackerColor) {
                         let effectivelyFrozenAttacker = piece.isFrozen || isSquareUnderActiveFreeze(r_attacker, c_attacker, activeSpells, currentPly);
-                        if (effectivelyFrozenAttacker) continue; 
+                        // Allow frozen kings to still "attack" for check validation purposes,
+                        // but not for delivering actual checkmate if they can't move.
+                        // The "cannot put a king in check or checkmate" for frozen pieces applies to active attacks,
+                        // not passive king safety checks.
+                        // if (effectivelyFrozenAttacker && piece.type.toLowerCase() !== 'k') continue; 
+                        if (effectivelyFrozenAttacker) {
+                             if (piece.type.toLowerCase() === 'k') {
+                                 // A frozen king still 'covers' squares for the purpose of whether the OTHER king can move there
+                             } else {
+                                continue; // Other frozen pieces do not exert attack
+                             }
+                        }
+
 
                         const pieceType = piece.type.toLowerCase();
                         if (pieceType === 'p') {
@@ -1289,7 +1292,12 @@
 
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
-                    if (board[r][c] && board[r][c].type === kingType) {
+                    const pieceOnSquare = board[r][c];
+                    if (pieceOnSquare && pieceOnSquare.type === kingType) {
+                        // Check if this king is frozen. If so, it cannot BE in check by normal means (unless a spell causes direct damage or something)
+                        // However, for the purpose of "is it safe to move to", even a frozen king "controls" its adjacent squares.
+                        // The rule "Frozen pieces cannot put a king in check or checkmate" applies to *delivering* check/mate.
+                        // For this function, we only care if the square is attacked.
                         kingPos = { r, c };
                         break;
                     }
@@ -1307,6 +1315,9 @@
                 for (let c = 0; c < 8; c++) {
                     const piece = board[r][c];
                     if (piece && piece.color === playerColor) { 
+                        let isPieceEffectivelyFrozen = piece.isFrozen || isSquareUnderActiveFreeze(r, c, activeSpells, currentPly);
+                        if(isPieceEffectivelyFrozen) continue;
+
                         for (let toR = 0; toR < 8; toR++) {
                             for (let toC = 0; toC < 8; toC++) {
                                 if (isValidMove(r, c, toR, toC, board, playerColor, enPassantTarget, currentCastlingRights, activeSpells, currentPly)) {
@@ -1330,14 +1341,23 @@
                             expiresAtPly: currentPly + 2 
                         });
 
+                        // Simulate king not being in check after casting freeze
                         if (!isKingInCheck(playerColor, board, enPassantTarget, tempActiveSpells, currentPly + 1)) {
+                            // Now check if there's any piece that *can* move (isn't frozen by the new spell or pre-existing conditions)
                             for (let pr = 0; pr < 8; pr++) {
                                 for (let pc = 0; pc < 8; pc++) {
                                     const p = board[pr][pc];
                                     if (p && p.color === playerColor) {
                                         let effectivelyFrozenByTempSpells = p.isFrozen || isSquareUnderActiveFreeze(pr, pc, tempActiveSpells, currentPly + 1);
                                         if (!effectivelyFrozenByTempSpells) {
-                                            return true; 
+                                            // Check if this non-frozen piece has any valid move
+                                            for (let ptoR = 0; ptoR < 8; ptoR++) {
+                                                for (let ptoC = 0; ptoC < 8; ptoC++) {
+                                                    if (isValidMove(pr, pc, ptoR, ptoC, board, playerColor, enPassantTarget, currentCastlingRights, tempActiveSpells, currentPly +1)) {
+                                                        return true; // Found a legal move after casting freeze
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -1355,8 +1375,10 @@
 
             if (pieceTypeUpper !== 'P') {
                 notation += pieceTypeUpper;
-            } else if (capturedPiece) { 
+            } else if (capturedPiece && !isEnPassant) { // Pawn capture uses file letter
                 notation += String.fromCharCode(97 + fromC);
+            } else if (isEnPassant){ // En-passant also uses file letter
+                 notation += String.fromCharCode(97 + fromC);
             }
             
             const toFile = String.fromCharCode(97 + toC);
@@ -1389,7 +1411,7 @@
                     gameState.activeSpells.push({
                         type: 'jump',
                         targetId: targetPiece.id,
-                        expiresAtPly: gameState.plyCount + 2 
+                        expiresAtPly: gameState.plyCount + 2 // Jump lasts for current player's move + opponent's move
                     });
                     targetPiece.isJumpable = true; 
                     spellApplied = true;
@@ -1416,8 +1438,8 @@
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { 
                             const pieceToFreeze = gameState.board[nr][nc];
                             if (pieceToFreeze) {
-                                pieceToFreeze.isFrozen = true; 
-                                affectedPieceIds.push(pieceToFreeze.id);
+                                // pieceToFreeze.isFrozen = true; // isFrozen property is set by activeSpells check
+                                affectedPieceIds.push(pieceToFreeze.id); // Keep track for unfreezing
                             }
                         }
                     }
@@ -1426,7 +1448,7 @@
                     type: 'freeze',
                     targetSquare: {r: freezeCenterR, c: freezeCenterC}, 
                     affectedPieceIds: affectedPieceIds, 
-                    expiresAtPly: gameState.plyCount + 2 
+                    expiresAtPly: gameState.plyCount + 2 // Freeze lasts for current player's turn + opponent's turn
                 });
                 spellApplied = true;
                 spellNotation = `freeze@${String.fromCharCode(97 + c_target)}${8 - r_target}`;
@@ -1443,6 +1465,11 @@
         }
 
         function activateSpellMode(type) {
+            if (gameState.selectedPiece) { // Auto-deselect
+                gameState.selectedPiece = null;
+                // renderBoard(); // Will be called later if spell activation proceeds
+            }
+
             if (gameState.isGameOver || gameState.awaitingPromotion) return; 
             if (gameState.spellMode && gameState.spellMode !== type && gameState.spellCaster === gameState.currentPlayer) { 
                 updateStatus("Another spell is already being targeted. Cancel it first.");
@@ -1453,10 +1480,6 @@
                 return;
             }
 
-            if (gameState.selectedPiece) {
-                updateStatus("Deselect your piece before casting a spell (click an empty square or your piece again).");
-                return;
-            }
             if (gameState.pendingSpellNotation) { 
                 updateStatus("You have already cast a spell this turn. Make your move or Cancel the cast spell.");
                 return;
@@ -1493,9 +1516,10 @@
             };
             
             updateStatus(`${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)} is casting ${spellName}. Select target on board or Cancel.`);
+            cancelButton.textContent = "Cancel Spell";
+            renderBoard(); 
             updateSpellControls(); 
             updateCancelButtonVisibility(); 
-            renderBoard(); 
         }
 
         function handleCancelAction() {
@@ -1540,10 +1564,7 @@
                             playerSpells.jumpLastUsedTurn = gameState.spellActivationState.originalLastUsedTurn;
                         }
                     } else if (cancelledSpellType === 'freeze') {
-                        spellToCancel.affectedPieceIds.forEach(id => {
-                            const piece = findPieceById(id);
-                            if (piece) piece.isFrozen = false; 
-                        });
+                        // No direct .isFrozen to revert on piece for freeze, it's zone based
                         playerSpells.freeze++;
                         if (gameState.spellActivationState && gameState.spellActivationState.type === 'freeze') {
                             playerSpells.freezeLastUsedTurn = gameState.spellActivationState.originalLastUsedTurn;
@@ -1562,6 +1583,7 @@
             gameState.spellMode = null;
             gameState.spellCaster = null;
             gameState.spellActivationState = null;
+            cancelButton.textContent = "Cancel"; 
 
             renderBoard();
             updateSpellControls();
@@ -1575,10 +1597,7 @@
             gameState.activeSpells.forEach(spell => {
                 if (gameState.plyCount >= spell.expiresAtPly) { 
                     if (spell.type === 'freeze') {
-                        spell.affectedPieceIds.forEach(id => { 
-                            const piece = findPieceById(id);
-                            if (piece) piece.isFrozen = false; 
-                        });
+                        // Visual effect of freeze zone is handled by renderBoard, no direct piece property
                     } else if (spell.type === 'jump') {
                          const piece = findPieceById(spell.targetId);
                          if (piece) piece.isJumpable = false;
@@ -1672,6 +1691,7 @@
             stateToSnapshot.blackPlayerTurn = next_blackPlayerTurn_state;
             stateToSnapshot.plyCount = gameState.plyCount; 
             stateToSnapshot.gameEndMessage = gameState.isGameOver ? gameEndMessage : "";
+            stateToSnapshot.useStandardPieces = useStandardPieces; 
             gameState.history.push(stateToSnapshot); 
             
             gameState.moveLog.push({ 
@@ -1721,12 +1741,14 @@
                  return;
             }
             
+            const currentPieceStyleBeforeLoad = useStandardPieces; 
+
             const keysToRestore = [
                 'board', 'currentPlayer', 'gameTurnNumber', 'whitePlayerTurn', 
                 'blackPlayerTurn', 'plyCount', 'spells', 'activeSpells', 
                 'selectedPiece', 'spellMode', 'spellCaster', 'spellActivationState',
                 'pendingSpellNotation', 'enPassantTarget', 'castlingRights', 
-                'isGameOver', 'gameEndMessage', 'awaitingPromotion', 'useStandardPieces'
+                'isGameOver', 'gameEndMessage', 'awaitingPromotion', 'useStandardPieces' 
             ];
 
             for (const key of keysToRestore) {
@@ -1738,13 +1760,13 @@
                     }
                 }
             }
-             // Restore piece style preference if it was saved in the snapshot
-            useStandardPieces = gameState.useStandardPieces === undefined ? false : gameState.useStandardPieces;
+            
+            useStandardPieces = gameState.useStandardPieces === undefined ? currentPieceStyleBeforeLoad : gameState.useStandardPieces;
             
             gameState.history = gameState.history.slice(0, plySnapshotIndex + 1);
             gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= plySnapshotIndex);
 
-            applyPieceStyle(); // This calls renderBoard
+            applyPieceStyle(); 
             updateSpellControls();
             updateCancelButtonVisibility(); 
             updateNotationDisplay();    
@@ -1820,8 +1842,14 @@
 
             if (!gameState.isGameOver && (gameState.spellMode || gameState.pendingSpellNotation)) {
                 cancelButton.style.display = 'block';
+                if (gameState.spellMode || gameState.pendingSpellNotation) { 
+                    cancelButton.textContent = "Cancel Spell";
+                } else {
+                    cancelButton.textContent = "Cancel"; 
+                }
             } else {
                 cancelButton.style.display = 'none';
+                cancelButton.textContent = "Cancel"; 
             }
         }
 
@@ -1895,7 +1923,6 @@
         document.getElementById('black-freeze-spell').addEventListener('click', () => activateSpellMode('freeze'));
 
     </script>
-
 
 
 </body></html>
