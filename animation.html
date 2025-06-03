@@ -267,55 +267,49 @@
             text-align: center;
             width: 100%; 
         }
+        
+        /* Background Color Explosion Animation */
+        @keyframes colorExplosion {
+            0% { background-color: #ffadad; } 10% { background-color: #ffd6a5; }
+            20% { background-color: #fdffb6; } 30% { background-color: #caffbf; }
+            40% { background-color: #9bf6ff; } 50% { background-color: #a0c4ff; }
+            60% { background-color: #bdb2ff; } 70% { background-color: #ffc6ff; }
+            80% { background-color: #fffffc; } 90% { background-color: #f0f0f0; }
+            100% { background-color: #fff; }  
+        }
 
-        /* CHECKMATE EFFECT STYLES */
-        body.game-view.checkmate-effect {
-            position: relative; 
+        body.checkmate-celebration-bg {
+            animation: colorExplosion 0.5s linear 10; 
+        }
+
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
             overflow: hidden; 
-        }
-        body.game-view.checkmate-effect::before,
-        body.game-view.checkmate-effect::after,
-        .checkmate-particle { /* Style for dynamically created particles */
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 6px; 
-            height: 6px;
-            border-radius: 50%;
-            opacity: 0;
-            animation-duration: 2s; 
-            animation-timing-function: cubic-bezier(0.1, 0.7, 0.3, 1); /* Smoother ease out */
-            animation-fill-mode: forwards; 
-            z-index: 5; /* Below game content if game content is still visible */
+            z-index: 9999; 
         }
 
-        @keyframes explode-particle-type1 {
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px; 
+            opacity: 0.9;
+            animation: fall 3s linear infinite; 
+        }
+
+        @keyframes fall {
             0% {
-                transform: translate(-50%, -50%) scale(0.3);
+                transform: translateY(-10vh) rotate(0deg); 
                 opacity: 1;
             }
             100% {
-                transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s, 15));
+                transform: translateY(110vh) rotate(720deg); 
                 opacity: 0;
             }
-        }
-         @keyframes background-color-explosion {
-            0% { background-color: #ffffff; } /* Start with normal background */
-            20% { background: radial-gradient(circle, #fffee8 0%, #ffd700 30%, #ff8c00 60%, #ff4500 100%); }
-            40% { background: radial-gradient(circle, #e8ffff 0%, #add8e6 30%, #87cefa 60%, #4682b4 100%); }
-            60% { background: radial-gradient(circle, #ffe8ff 0%, #da70d6 30%, #ba55d3 60%, #9932cc 100%); }
-            80% { background: radial-gradient(circle, #e8ffe8 0%, #90ee90 30%, #3cb371 60%, #2e8b57 100%); }
-            100% { background-color: #ffffff; } /* End by fading back */
-        }
-
-        body.game-view.checkmate-effect #game-content-wrapper {
-             /* opacity: 0.8;  Optional: make game slightly transparent */
-            position: relative; 
-            z-index: 10; 
-        }
-         body.game-view.checkmate-effect {
-            animation: background-color-explosion 2.5s ease-out forwards;
         }
 
 
@@ -489,14 +483,13 @@
             <div id="notation-area" class="notation-area"></div>
         </div>
         <div id="gif-output-area">
-            <!-- Can be used for messages or later direct GIF display -->
+            <!-- Content here if needed -->
         </div>
     </div>
 
     <script id="savedGameStateData" type="application/json"></script>
 
     <script id="home-page-script">
-        // ... (Home page script remains the same)
         const startGameButton = document.getElementById('start-game-button');
         const goHomeButton = document.getElementById('go-home-button');
         const mainBody = document.body;
@@ -516,7 +509,6 @@
     </script>
 
     <script id="spell-chess-game-script">
-        // ... (All JavaScript from the previous correct version is here)
         const PIECES = {
             'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',
             'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
@@ -545,6 +537,7 @@
         const downloadGameButton = document.getElementById('download-game-button');
         const downloadGifButton = document.getElementById('download-gif-button');
         const togglePiecesButton = document.getElementById('toggle-pieces-button');
+        const confettiContainer = document.getElementById('confetti-container'); // Added for confetti
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -620,7 +613,6 @@
         }
 
         function resetGame(forceNewGame = false) {
-            document.body.classList.remove('checkmate-effect'); 
             if (!forceNewGame && initialGameDataFromSave) {
                 gameState = deepCopyFullState(initialGameDataFromSave); 
                 useStandardPieces = gameState.useStandardPieces === undefined ? false : gameState.useStandardPieces; 
@@ -644,9 +636,6 @@
 
             if (gameState.isGameOver) {
                 updateStatus(gameState.gameEndMessage || "Game over.");
-                 if (gameState.gameEndMessage && (gameState.gameEndMessage.toLowerCase().includes("checkmate") || gameState.gameEndMessage.toLowerCase().includes("king captured"))) {
-                    document.body.classList.add('checkmate-effect');
-                }
             } else if (gameState.awaitingPromotion) {
                 updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
             } else {
@@ -778,8 +767,7 @@
 
             updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
             downloadGifButton.disabled = true;
-            const otherControlButtons = document.querySelectorAll('.controls button:not(#download-gif-button)');
-            otherControlButtons.forEach(btn => btn.disabled = true);
+            document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
             window.open('https://ezgif.com/maker', '_blank');
 
@@ -809,7 +797,7 @@
                     gameState.plyCount = tempGameStateForRender.plyCount; 
                     gameState.selectedPiece = null; 
                     useStandardPieces = tempGameStateForRender.useStandardPieces === undefined ? originalUseStandardPieces : tempGameStateForRender.useStandardPieces;
-                    applyPieceStyle(); 
+                    applyPieceStyle(); // This calls renderBoard which will apply the correct piece characters
                     
                     updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
                     await new Promise(resolve => setTimeout(resolve, 50)); 
@@ -851,20 +839,21 @@
                 gameState.selectedPiece = originalSelectedPieceJSON ? JSON.parse(originalSelectedPieceJSON) : null;
                 gameState.plyCount = actualCurrentPlyCount; 
                 useStandardPieces = originalUseStandardPieces; 
-                applyPieceStyle(); // This will call renderBoard
+                applyPieceStyle(); // This calls renderBoard
 
-                // Re-enable buttons based on the restored game state
-                downloadGifButton.disabled = false; // Always re-enable this one
-                updateSpellControls(); // This will handle spell buttons based on game state
-                updateCancelButtonVisibility(); // Handle cancel button
-                 document.querySelectorAll('.controls button').forEach(btn => {
-                    if (btn.id === 'download-gif-button' || btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button') {
+                // Re-enable buttons correctly based on game state
+                downloadGifButton.disabled = false; 
+                document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
+                    const isAlwaysEnabled = btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button';
+                    if (isAlwaysEnabled) {
                         btn.disabled = false;
+                    } else { // Spell buttons, cancel button
+                        btn.disabled = gameState.isGameOver || gameState.awaitingPromotion;
                     }
                 });
-                // Explicitly call updateSpellControls again as it depends on gameState.currentPlayer
-                updateSpellControls();
-                
+                updateSpellControls(); // Specifically refresh spell buttons state
+
+
                 if (gameState.isGameOver) {
                     updateStatus(gameState.gameEndMessage || "Game over.");
                 } else if (gameState.awaitingPromotion) {
@@ -878,6 +867,40 @@
                 }
             }
         });
+
+        function triggerCheckmateAnimation() {
+            document.body.classList.add('checkmate-celebration-bg');
+            
+            const numConfetti = 150; 
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti-piece');
+                
+                confetti.style.left = Math.random() * 100 + 'vw';
+                const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590', '#277da1'];
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                confetti.style.animationDelay = Math.random() * 2 + 's'; 
+                const size = Math.random() * 0.5 + 0.5; 
+                confetti.style.width = (10 * size) + 'px';
+                confetti.style.height = (20 * size) + 'px';
+
+                // Ensure confettiContainer exists before appending
+                const container = document.getElementById('confetti-container');
+                if (container) {
+                    container.appendChild(confetti);
+                }
+            }
+
+            setTimeout(() => {
+                document.body.classList.remove('checkmate-celebration-bg');
+                const container = document.getElementById('confetti-container');
+                if (container) {
+                    container.innerHTML = ''; 
+                }
+            }, 5500); 
+        }
+
 
         function renderBoard() {
             chessboardDiv.innerHTML = '';
@@ -1120,6 +1143,7 @@
             updateCancelButtonVisibility(); 
         }
 
+        // ... (All other JS functions like isPathClear, isSquareAttacked, etc. remain the same) ...
         function isPathClear(fromR, fromC, toR, toC, board) {
             const dr = Math.sign(toR - fromR);
             const dc = Math.sign(toC - fromC);
@@ -1353,8 +1377,10 @@
                 for (let c = 0; c < 8; c++) {
                     const piece = board[r][c];
                     if (piece && piece.color === playerColor) { 
-                        let isPieceEffectivelyFrozen = piece.isFrozen || isSquareUnderActiveFreeze(r, c, activeSpells, currentPly);
-                        if(isPieceEffectivelyFrozen) continue;
+                        let isPieceEffectivelyFrozen = isSquareUnderActiveFreeze(r, c, activeSpells, currentPly); // Only check active freeze zones for hasLegalMoves
+                        if(isPieceEffectivelyFrozen && piece.type.toLowerCase() !== 'k') continue; // A frozen king might still have a castling move if squares aren't attacked
+                        if(isPieceEffectivelyFrozen && piece.type.toLowerCase() === 'k' && !checkCastleConditions(r,c,r,c+2,board,playerColor,currentCastlingRights,activeSpells,currentPly,enPassantTarget) && !checkCastleConditions(r,c,r,c-2,board,playerColor,currentCastlingRights,activeSpells,currentPly,enPassantTarget) ) continue;
+
 
                         for (let toR = 0; toR < 8; toR++) {
                             for (let toC = 0; toC < 8; toC++) {
@@ -1384,7 +1410,7 @@
                                 for (let pc = 0; pc < 8; pc++) {
                                     const p = board[pr][pc];
                                     if (p && p.color === playerColor) {
-                                        let effectivelyFrozenByTempSpells = p.isFrozen || isSquareUnderActiveFreeze(pr, pc, tempActiveSpells, currentPly + 1);
+                                        let effectivelyFrozenByTempSpells = isSquareUnderActiveFreeze(pr, pc, tempActiveSpells, currentPly + 1);
                                         if (!effectivelyFrozenByTempSpells) {
                                             for (let ptoR = 0; ptoR < 8; ptoR++) {
                                                 for (let ptoC = 0; ptoC < 8; ptoC++) {
@@ -1462,26 +1488,14 @@
                 playerSpells.freeze--;
                 playerSpells.freezeLastUsedTurn = currentCastingGameTurn;
 
-                const affectedPieceIds = [];
+                const affectedPieceIds = []; // Not strictly needed with current freeze logic but kept if rules evolve
                 const freezeCenterR = r_target;
                 const freezeCenterC = c_target;
                 
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        const nr = freezeCenterR + dr; 
-                        const nc = freezeCenterC + dc; 
-                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { 
-                            const pieceToFreeze = gameState.board[nr][nc];
-                            if (pieceToFreeze) {
-                                affectedPieceIds.push(pieceToFreeze.id);
-                            }
-                        }
-                    }
-                }
                 gameState.activeSpells.push({
                     type: 'freeze',
                     targetSquare: {r: freezeCenterR, c: freezeCenterC}, 
-                    affectedPieceIds: affectedPieceIds, 
+                    affectedPieceIds: affectedPieceIds, // For potential future use if unfreezing specific pieces
                     expiresAtPly: gameState.plyCount + 2 
                 });
                 spellApplied = true;
@@ -1501,6 +1515,7 @@
         function activateSpellMode(type) {
             if (gameState.selectedPiece) { 
                 gameState.selectedPiece = null;
+                 // No immediate renderBoard; will be handled by subsequent logic
             }
 
             if (gameState.isGameOver || gameState.awaitingPromotion) return; 
@@ -1627,12 +1642,11 @@
 
             gameState.activeSpells.forEach(spell => {
                 if (gameState.plyCount >= spell.expiresAtPly) { 
-                    if (spell.type === 'freeze') {
-                        // Visual effect of freeze zone is handled by renderBoard
-                    } else if (spell.type === 'jump') {
+                    if (spell.type === 'jump') {
                          const piece = findPieceById(spell.targetId);
                          if (piece) piece.isJumpable = false;
                     }
+                    // For freeze, effect removal is implicit via plyCount check in isSquareUnderActiveFreeze
                     boardNeedsRender = true; 
                 } else {
                     stillActive.push(spell); 
@@ -1672,6 +1686,7 @@
                 gameState.isGameOver = true;
                 const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                 gameEndMessage = `King captured! ${winner} wins!`;
+                 if (!gameState.isGameOver) triggerCheckmateAnimation(); // Trigger only if not already over by other means
             } else {
                 if (isKingInCheck(opponentColor, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
                     isCheck = true;
@@ -1681,6 +1696,7 @@
                         gameState.isGameOver = true;
                         const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                         gameEndMessage = `Checkmate! ${winner} wins!`;
+                        triggerCheckmateAnimation();
                     }
                 } else { 
                     const nextPlayerSpells = gameState.spells[opponentColor];
@@ -1691,12 +1707,6 @@
                 }
             }
             
-            if (isCheckmate) { 
-                document.body.classList.add('checkmate-effect');
-            } else {
-                document.body.classList.remove('checkmate-effect'); 
-            }
-
             let finalMoveNotationWithSymbols = gameState.pendingSpellNotation ? gameState.pendingSpellNotation + " " + moveNotation : moveNotation;
             if (isCheckmate) {
                 finalMoveNotationWithSymbols += "#";
@@ -1810,17 +1820,10 @@
 
             if (gameState.isGameOver) {
                 updateStatus(gameState.gameEndMessage || "Game over at this point.");
-                 if (gameState.gameEndMessage && (gameState.gameEndMessage.toLowerCase().includes("checkmate") || gameState.gameEndMessage.toLowerCase().includes("king captured"))) {
-                    document.body.classList.add('checkmate-effect');
-                } else {
-                    document.body.classList.remove('checkmate-effect');
-                }
             } else if (gameState.awaitingPromotion) {
-                 document.body.classList.remove('checkmate-effect');
                  updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
             }
             else {
-                document.body.classList.remove('checkmate-effect');
                 let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
                 if (gameState.board && gameState.board.length > 0 && 
                     isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
