@@ -82,8 +82,16 @@
 
 
         #home-page-content h1 {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 2.5em;
+        }
+        #home-page-content img {
+            max-width: 150px;
+            height: auto;
+            margin: 0 auto 20px auto;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            display: block;
         }
         #start-game-button {
             padding: 15px 30px;
@@ -266,12 +274,14 @@
             margin-top: 20px;
             text-align: center;
             width: 100%; 
+            max-width: 1100px;
             border: 1px solid #ccc;
             padding: 10px;
             background: #f8f9fa;
          }
          #gif-output-area img {
              max-width: 100%;
+             max-height: 480px;
              height: auto;
              border: 2px solid #333;
          }
@@ -383,10 +393,11 @@
         }
     </style>
 </head>
-<body class="game-view vsc-initialized"> 
+<body class="home-view vsc-initialized"> 
 
     <div id="home-page-content">
         <h1>Spell Chess</h1>
+        <img src="https://i.imgur.com/u46Ab8M.gif" alt="Animated chess knight move">
         <button id="start-game-button">Two Player Game</button>
     </div>
 
@@ -1960,6 +1971,9 @@
                     console.error("Error parsing saved game data:", e);
                     initialGameDataFromSave = null;
                 }
+            } else {
+                 mainBody.classList.remove('game-view'); 
+                 mainBody.classList.add('home-view');
             }
             resetGame(); 
         });
