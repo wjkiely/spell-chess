@@ -266,7 +266,19 @@
             margin-top: 20px;
             text-align: center;
             width: 100%; 
-        }
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #f8f9fa;
+         }
+         #gif-output-area img {
+             max-width: 100%;
+             height: auto;
+             border: 2px solid #333;
+         }
+         #gif-output-area a {
+             display: inline-block;
+             margin-top: 10px;
+         }
 
 
         /* --- MOBILE STYLES --- */
@@ -438,8 +450,8 @@
             </div>
             <div id="notation-area" class="notation-area"></div>
         </div>
-        <div id="gif-output-area">
-            <!-- Content here if needed -->
+        <div id="gif-output-area" style="display: none;">
+            <!-- Generated GIF will appear here -->
         </div>
     </div>
 
@@ -493,6 +505,7 @@
         const downloadGameButton = document.getElementById('download-game-button');
         const downloadGifButton = document.getElementById('download-gif-button');
         const togglePiecesButton = document.getElementById('toggle-pieces-button');
+        const gifOutputArea = document.getElementById('gif-output-area');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -583,6 +596,8 @@
                 console.log("New game started.");
             }
 
+            gifOutputArea.style.display = 'none';
+            gifOutputArea.innerHTML = '';
             promotionChoicesDiv.style.display = 'none';
             applyPieceStyle();
             updateSpellControls();
@@ -770,7 +785,8 @@
                 const gif = new GIF({
                     workers: 2,
                     quality: 10,
-                    workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+                    workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js',
+                    repeat: 0 // 0 for infinite loop
                 });
 
                 const tempGameStateForRender = {};
@@ -788,7 +804,7 @@
                     applyPieceStyle();
                     
                     updateStatus(`Capturing frame ${i + 1} of ${gameState.history.length}...`);
-                    await new Promise(resolve => setTimeout(resolve, 10)); // small delay for render
+                    await new Promise(resolve => setTimeout(resolve, 10));
 
                     const canvas = await html2canvas(chessboardDiv, {
                         allowTaint: true, useCORS: true, logging: false,
@@ -799,18 +815,31 @@
                 }
 
                 gif.on('finished', function(blob) {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'spell_chess_animation.gif';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href);
-                    updateStatus("GIF downloaded successfully.");
+                    gifOutputArea.innerHTML = '';
+                    gifOutputArea.style.display = 'block';
+
+                    const url = URL.createObjectURL(blob);
+                    const img = document.createElement('img');
+                    img.src = url;
+
+                    const title = document.createElement('h3');
+                    title.textContent = 'Generated GIF Animation';
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = url;
+                    downloadLink.download = 'spell_chess_animation.gif';
+                    downloadLink.textContent = 'Download GIF';
+
+                    gifOutputArea.appendChild(title);
+                    gifOutputArea.appendChild(img);
+                    gifOutputArea.appendChild(document.createElement('br'));
+                    gifOutputArea.appendChild(downloadLink);
+
+                    updateStatus("GIF generated successfully. Scroll down to view.");
                     restoreUI();
                 });
 
-                updateStatus(`Rendering GIF... The page may become unresponsive.`);
+                updateStatus(`Rendering GIF... This may take a moment.`);
                 gif.render();
 
             } catch (error) {
@@ -1781,6 +1810,9 @@
             gameState.history = gameState.history.slice(0, plySnapshotIndex + 1);
             gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= plySnapshotIndex);
 
+            gifOutputArea.style.display = 'none'; 
+            gifOutputArea.innerHTML = '';
+            
             applyPieceStyle(); 
             updateSpellControls();
             updateCancelButtonVisibility(); 
