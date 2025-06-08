@@ -65,6 +65,7 @@
             text-align: center;
             font-size: 0.95em;
             line-height: 1.6;
+            position: relative;
         }
         #announcement-box h3 {
             margin-top: 0;
@@ -77,6 +78,21 @@
         }
         #announcement-box a:hover {
             text-decoration: underline;
+        }
+        .close-button {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .close-button:hover {
+            color: #333;
         }
 
 
@@ -340,8 +356,8 @@
             width: 100%;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
-            bottom: 100%; /* Position above the button */
-            margin-bottom: 5px;
+            top: 100%; /* Position below the button */
+            margin-top: 5px;
         }
         .dropdown-content button {
             color: black;
@@ -356,7 +372,7 @@
             border-bottom: none;
         }
         .dropdown-content button:hover {background-color: #ddd;}
-        .options-dropdown:hover .dropdown-content {display: block;}
+        /* REMOVED .options-dropdown:hover .dropdown-content rule */
 
         #promotion-choices {
             margin-top: 10px;
@@ -481,6 +497,7 @@
     </div>
 
     <div id="announcement-box">
+        <button id="close-announcement-button" class="close-button">&times;</button>
         <h3><a href="https://www.chess.com/club/spell-chess-team-game-starting-2025-06-01" target="_blank">Spell Chess Team Game</a></h3>
         <p>
             Start Date: June 1, 2025<br>
@@ -650,6 +667,8 @@
         const importGameTextarea = document.getElementById('import-game-textarea');
         const optionsToggleButton = document.getElementById('options-toggle-button');
         const optionsContent = document.getElementById('options-content');
+        const closeAnnouncementButton = document.getElementById('close-announcement-button');
+        const announcementBox = document.getElementById('announcement-box');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -1773,21 +1792,6 @@
             }
             return null;
         }
-
-        function generateStateSignature(state) {
-            const boardString = state.board.map(row => 
-                row.map(p => {
-                    if (!p) return ' ';
-                    let char = p.type;
-                    if(p.isJumpable) char += '*';
-                    return char;
-                }).join('')
-            ).join('/');
-            
-            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
-
-            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
-        }
         
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
@@ -2142,7 +2146,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const gameData = urlParams.get('game');
             
-            // This listener must be attached regardless of URL params.
+            const mainBody = document.body;
+            
             document.addEventListener('keydown', (event) => {
                 if (event.target.tagName === 'INPUT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'TEXTAREA') {
                     return;
@@ -2168,8 +2173,6 @@
                 }
             } else {
                 const savedDataScript = document.getElementById('savedGameStateData');
-                const mainBody = document.body; 
-
                 if (savedDataScript && savedDataScript.textContent.trim() !== "") {
                     try {
                         initialGameDataFromSave = JSON.parse(savedDataScript.textContent);
@@ -2424,7 +2427,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = originalText;
+                    getLinkButton.textContent = "Get Custom Game Link";
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
@@ -2485,7 +2488,10 @@
                 optionsContent.style.display = 'none';
             }
         });
-
+        
+        closeAnnouncementButton.addEventListener('click', () => {
+            announcementBox.style.display = 'none';
+        });
 
     </script>
 
