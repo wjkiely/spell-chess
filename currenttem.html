@@ -67,18 +67,6 @@
             line-height: 1.6;
             position: relative;
         }
-        #close-announcement-button {
-            position: absolute;
-            top: 5px;
-            right: 12px;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-        }
-        #close-announcement-button:hover {
-            color: #333;
-        }
         #announcement-box h3 {
             margin-top: 0;
             color: #0056b3;
@@ -90,6 +78,19 @@
         }
         #announcement-box a:hover {
             text-decoration: underline;
+        }
+        .close-announcement-button {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close-announcement-button:hover {
+            color: #000;
         }
 
 
@@ -369,7 +370,7 @@
             border-bottom: none;
         }
         .dropdown-content button:hover {background-color: #ddd;}
-        .options-dropdown:hover .dropdown-content {display: block;}
+        /* REMOVED: .options-dropdown:hover .dropdown-content {display: block;} */
 
         #promotion-choices {
             margin-top: 10px;
@@ -494,7 +495,7 @@
     </div>
 
     <div id="announcement-box">
-        <span id="close-announcement-button">&times;</span>
+        <span id="close-announcement-button" class="close-announcement-button">&times;</span>
         <h3><a href="https://www.chess.com/club/spell-chess-team-game-starting-2025-06-01" target="_blank">Spell Chess Team Game</a></h3>
         <p>
             Start Date: June 1, 2025<br>
@@ -604,7 +605,7 @@
         </div>
     </div>
 
-    <script id="savedGameStateData" type="application/json">{}</script>
+    <script id="savedGameStateData" type="application/json">{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"history":[{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false,"currentHistoryViewIndex":0,"repetitionCounter":{}}],"useStandardPieces":false,"currentHistoryViewIndex":0,"repetitionCounter":{}}</script>
 
     <script id="home-page-script">
         const startGameButton = document.getElementById('start-game-button');
@@ -664,7 +665,6 @@
         const importGameTextarea = document.getElementById('import-game-textarea');
         const optionsToggleButton = document.getElementById('options-toggle-button');
         const optionsContent = document.getElementById('options-content');
-        const announcementBox = document.getElementById('announcement-box');
         const closeAnnouncementButton = document.getElementById('close-announcement-button');
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -1547,15 +1547,16 @@
                 const fromRank = (8 - fromR).toString();
 
                 const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
-                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
                 
-                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
-                     notation += fromFile + fromRank; // Both file and rank are needed
-                }
-                else if (sameFileCompetitors.length > 0) {
-                    notation += fromRank; // Rooks on same file, use rank
+                if (sameFileCompetitors.length === 0) {
+                     notation += fromFile; // Files are different, file is enough
                 } else {
-                    notation += fromFile; // Default to file
+                    const sameRankAndFileCompetitors = sameFileCompetitors.filter(comp => comp.r === fromR);
+                     if (sameRankAndFileCompetitors.length > 0) {
+                         notation += fromFile + fromRank; // File and rank are needed
+                     } else {
+                         notation += fromRank; // Files are the same, use rank
+                     }
                 }
             }
             
@@ -1788,7 +1789,7 @@
             }
             return null;
         }
-        
+
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
             const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
@@ -2138,7 +2139,11 @@
             });
         }
         
-        function attachKeydownListener() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameData = urlParams.get('game');
+            
+            // This listener must be attached regardless of URL params.
             document.addEventListener('keydown', (event) => {
                 if (event.target.tagName === 'INPUT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'TEXTAREA') {
                     return;
@@ -2151,14 +2156,7 @@
                     if (!historyForwardButtons[0].disabled) handleHistoryForward();
                 }
             });
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const gameData = urlParams.get('game');
-            
-            attachKeydownListener();
-            
+
             if(gameData) {
                 try {
                     const compactString = atob(decodeURIComponent(gameData));
@@ -2315,8 +2313,7 @@
                         notation = "T";
                         break;
                     case 'R':
-                        winner = player === 'white' ? 'Black' : 'White';
-                        message = `${winner} wins by resignation.`;
+                        message = `${player === 'white' ? 'White' : 'Black'} resigns. ${winner} wins.`;
                         notation = "R";
                         break;
                     case 'D':
@@ -2477,10 +2474,6 @@
             updateStatus("Game loaded from URL successfully!");
         }
         
-        closeAnnouncementButton.addEventListener('click', () => {
-            announcementBox.style.display = 'none';
-        });
-
         // Dropdown Menu Logic
         optionsToggleButton.addEventListener('click', function(event) {
             optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
@@ -2491,6 +2484,10 @@
             if (!event.target.matches('.options-button') && optionsContent.style.display === 'block') {
                 optionsContent.style.display = 'none';
             }
+        });
+        
+        closeAnnouncementButton.addEventListener('click', () => {
+             document.getElementById('announcement-box').style.display = 'none';
         });
 
     </script>
