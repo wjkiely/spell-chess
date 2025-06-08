@@ -55,20 +55,20 @@
         }
          body.game-view #announcement-box { 
             display: block; 
-            position: relative;
             width: 100%;
             max-width: 1100px; 
             margin: 0 auto 20px auto; 
-            padding: 20px;
+            padding: 15px;
             border: 2px solid #007bff;
             background-color: #e7f3ff;
             border-radius: 8px;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 0.95em;
             line-height: 1.6;
         }
-        #announcement-box p {
-            margin: 0;
+        #announcement-box h3 {
+            margin-top: 0;
+            color: #0056b3;
         }
         #announcement-box a {
             color: #0056b3;
@@ -77,21 +77,6 @@
         }
         #announcement-box a:hover {
             text-decoration: underline;
-        }
-        #close-announcement-button {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            line-height: 1;
-            cursor: pointer;
-            color: #0056b3;
-            opacity: 0.7;
-        }
-        #close-announcement-button:hover {
-            opacity: 1;
         }
 
 
@@ -355,8 +340,8 @@
             width: 100%;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
-            bottom: 100%; /* Position above the button */
-            margin-bottom: 5px;
+            top: 100%; /* Position below the button */
+            margin-top: 5px;
         }
         .dropdown-content button {
             color: black;
@@ -371,7 +356,7 @@
             border-bottom: none;
         }
         .dropdown-content button:hover {background-color: #ddd;}
-        .options-dropdown:hover .dropdown-content {display: block;}
+
 
         #promotion-choices {
             margin-top: 10px;
@@ -496,8 +481,13 @@
     </div>
 
     <div id="announcement-box">
-        <button id="close-announcement-button">&times;</button>
-        <p>See the <a href="https://wjkiely.github.io/spell-chess/current.html" target="_blank">current position of the Team Spell Chess game</a> happening now.</p>
+        <h3><a href="https://www.chess.com/club/spell-chess-team-game-starting-2025-06-01" target="_blank">Spell Chess Team Game</a></h3>
+        <p>
+            Start Date: June 1, 2025<br>
+            Time Control: 24 Hours Per Move<br>
+            Join the club for the <a href="https://www.chess.com/club/white-team-spell-chess-game-2025-06-01" target="_blank">White Team</a> or <a href="https://www.chess.com/club/black-team-spell-chess-game-2025-06-01" target="_blank">Black Team</a> to participate!<br>
+            This page is kept up to date with the current position by <a href="https://www.chess.com/member/LongTermFuture" target="_blank">LongTermFuture</a>.
+        </p>
     </div>
 
     <div id="game-content-wrapper">
@@ -766,13 +756,12 @@
         }
         
         function applyPieceStyle() {
-            const toggleButton = document.getElementById('toggle-pieces-button');
             if (useStandardPieces) {
                 chessboardDiv.classList.remove('colored-pieces');
-                if (toggleButton) toggleButton.textContent = "Use Colored Pieces";
+                document.getElementById('toggle-pieces-button').textContent = "Use Colored Pieces";
             } else {
                 chessboardDiv.classList.add('colored-pieces');
-                if (toggleButton) toggleButton.textContent = "Use Standard Pieces";
+                document.getElementById('toggle-pieces-button').textContent = "Use Standard Pieces";
             }
             if(gameState && gameState.board && gameState.board.length > 0) { 
                renderBoard();
@@ -1784,7 +1773,7 @@
             }
             return null;
         }
-
+        
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
             const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
@@ -2138,6 +2127,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const gameData = urlParams.get('game');
             
+            // This listener must be attached regardless of URL params.
             document.addEventListener('keydown', (event) => {
                 if (event.target.tagName === 'INPUT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'TEXTAREA') {
                     return;
@@ -2331,7 +2321,7 @@
         }
 
         function findMoveFromSAN(san) {
-             // Handle Castling first, as it's a unique notation
+            // Handle Castling first, as it's a unique notation
             if (san.startsWith('O-O-O') || san.startsWith('0-0-0')) {
                 const r = gameState.currentPlayer === 'white' ? 7 : 0;
                 return { fromR: r, fromC: 4, toR: r, toC: 2 };
@@ -2404,7 +2394,7 @@
         }
         
         getLinkButton.addEventListener('click', () => {
-            const baseURL = 'https://wjkiely.github.io/spell-chess/';
+            const baseURL = 'https://wjkiely.github.io/spell-chess/current.html';
             if (gameState.moveLog.length === 0) {
                 updateStatus("No moves to create a link from.");
                 return;
@@ -2469,10 +2459,6 @@
             updateStatus("Game loaded from URL successfully!");
         }
         
-        document.getElementById('close-announcement-button').addEventListener('click', () => {
-            document.getElementById('announcement-box').style.display = 'none';
-        });
-
         // Dropdown Menu Logic
         optionsToggleButton.addEventListener('click', function(event) {
             optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
