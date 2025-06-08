@@ -65,7 +65,6 @@
             text-align: center;
             font-size: 0.95em;
             line-height: 1.6;
-            position: relative;
         }
         #announcement-box h3 {
             margin-top: 0;
@@ -78,19 +77,6 @@
         }
         #announcement-box a:hover {
             text-decoration: underline;
-        }
-        .close-announcement-button {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #999;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .close-announcement-button:hover {
-            color: #000;
         }
 
 
@@ -354,8 +340,8 @@
             width: 100%;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
-            top: 100%; /* Position below the button */
-            margin-top: 5px;
+            bottom: 100%; /* Position above the button */
+            margin-bottom: 5px;
         }
         .dropdown-content button {
             color: black;
@@ -370,7 +356,7 @@
             border-bottom: none;
         }
         .dropdown-content button:hover {background-color: #ddd;}
-        /* REMOVED: .options-dropdown:hover .dropdown-content {display: block;} */
+        .options-dropdown:hover .dropdown-content {display: block;}
 
         #promotion-choices {
             margin-top: 10px;
@@ -495,7 +481,6 @@
     </div>
 
     <div id="announcement-box">
-        <span id="close-announcement-button" class="close-announcement-button">&times;</span>
         <h3><a href="https://www.chess.com/club/spell-chess-team-game-starting-2025-06-01" target="_blank">Spell Chess Team Game</a></h3>
         <p>
             Start Date: June 1, 2025<br>
@@ -620,7 +605,7 @@
             }
         });
 
-        document.getElementById('go-home-button').addEventListener('click', function() {
+        goHomeButton.addEventListener('click', function() {
             mainBody.classList.remove('game-view');
             mainBody.classList.add('home-view');
         });
@@ -665,7 +650,7 @@
         const importGameTextarea = document.getElementById('import-game-textarea');
         const optionsToggleButton = document.getElementById('options-toggle-button');
         const optionsContent = document.getElementById('options-content');
-        const closeAnnouncementButton = document.getElementById('close-announcement-button');
+
 
         function deepCopyGameStateForSnapshot(sourceState) { 
             if (!sourceState) return null;
@@ -896,7 +881,7 @@
             }
 
             updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
-            document.getElementById('download-gif-button').disabled = true;
+            downloadGifButton.disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
             window.open('https://ezgif.com/maker', '_blank');
@@ -936,7 +921,7 @@
             } finally {
                 // Restore the game to its original viewing state
                 loadStateFromHistory(originalHistoryViewIndex, true); 
-                document.getElementById('download-gif-button').disabled = false;
+                downloadGifButton.disabled = false;
             }
         });
 
@@ -1547,16 +1532,15 @@
                 const fromRank = (8 - fromR).toString();
 
                 const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
+                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
                 
-                if (sameFileCompetitors.length === 0) {
-                     notation += fromFile; // Files are different, file is enough
+                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
+                     notation += fromFile + fromRank; // Both file and rank are needed
+                }
+                else if (sameFileCompetitors.length > 0) {
+                    notation += fromRank; // Rooks on same file, use rank
                 } else {
-                    const sameRankAndFileCompetitors = sameFileCompetitors.filter(comp => comp.r === fromR);
-                     if (sameRankAndFileCompetitors.length > 0) {
-                         notation += fromFile + fromRank; // File and rank are needed
-                     } else {
-                         notation += fromRank; // Files are the same, use rank
-                     }
+                    notation += fromFile; // Default to file
                 }
             }
             
@@ -1790,6 +1774,21 @@
             return null;
         }
 
+        function generateStateSignature(state) {
+            const boardString = state.board.map(row => 
+                row.map(p => {
+                    if (!p) return ' ';
+                    let char = p.type;
+                    if(p.isJumpable) char += '*';
+                    return char;
+                }).join('')
+            ).join('/');
+            
+            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
+
+            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
+        }
+        
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
             const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
@@ -2313,7 +2312,8 @@
                         notation = "T";
                         break;
                     case 'R':
-                        message = `${player === 'white' ? 'White' : 'Black'} resigns. ${winner} wins.`;
+                        winner = player === 'white' ? 'Black' : 'White';
+                        message = `${winner} wins by resignation.`;
                         notation = "R";
                         break;
                     case 'D':
@@ -2424,7 +2424,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = "Get Custom Game Link";
+                    getLinkButton.textContent = originalText;
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
@@ -2485,10 +2485,7 @@
                 optionsContent.style.display = 'none';
             }
         });
-        
-        closeAnnouncementButton.addEventListener('click', () => {
-             document.getElementById('announcement-box').style.display = 'none';
-        });
+
 
     </script>
 
