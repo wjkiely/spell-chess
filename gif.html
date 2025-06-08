@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spell Chess</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
     
     <style>
         /* Global reset/base */
@@ -82,16 +81,8 @@
 
 
         #home-page-content h1 {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-size: 2.5em;
-        }
-        #home-page-content img {
-            max-width: 150px;
-            height: auto;
-            margin: 0 auto 20px auto;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            display: block;
         }
         #start-game-button {
             padding: 15px 30px;
@@ -175,6 +166,9 @@
         .square.light { background-color: #f0d9b5; }
         .square.dark { background-color: #b58863; }
         .square.selected { background-color: #6a994e; }
+        .square.highlight-history {
+            box-shadow: inset 0 0 10px 4px rgba(255, 0, 0, 0.6);
+        }
 
         .square.valid-move-hint::before {
             content: '';
@@ -234,8 +228,20 @@
         .promotion-button {
             margin-bottom: 5px;
         }
-        .spell-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
+        .spell-button:disabled, .reset-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
         .spell-button.targeting { background-color: #add8e6; }
+
+        .navigation-controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        .navigation-controls .reset-button {
+            flex-grow: 1;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
 
         .notation-area {
             padding: 10px;
@@ -258,9 +264,17 @@
             text-decoration: underline;
             color: #0056b3;
             margin-right: 5px;
+            padding: 2px 4px;
+            border-radius: 3px;
         }
         .notation-area .notation-move:hover {
             color: #007bff;
+            background-color: #e9ecef;
+        }
+         .notation-area .notation-move.current-move {
+            background-color: #a7c957;
+            color: white;
+            text-decoration: none;
         }
 
         #promotion-choices {
@@ -274,21 +288,7 @@
             margin-top: 20px;
             text-align: center;
             width: 100%; 
-            max-width: 1100px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background: #f8f9fa;
-         }
-         #gif-output-area img {
-             max-width: 100%;
-             max-height: 480px;
-             height: auto;
-             border: 2px solid #333;
-         }
-         #gif-output-area a {
-             display: inline-block;
-             margin-top: 10px;
-         }
+        }
 
 
         /* --- MOBILE STYLES --- */
@@ -393,11 +393,10 @@
         }
     </style>
 </head>
-<body class="home-view vsc-initialized"> 
+<body class="game-view vsc-initialized"> 
 
     <div id="home-page-content">
         <h1>Spell Chess</h1>
-        <img src="https://i.imgur.com/u46Ab8M.gif" alt="Animated chess knight move">
         <button id="start-game-button">Two Player Game</button>
     </div>
 
@@ -445,9 +444,14 @@
                     <small id="black-freeze-cooldown">Ready</small>
                 </div>
                 
+                <div class="navigation-controls">
+                    <button id="history-back-button" class="reset-button" disabled="">&lt;</button>
+                    <button id="history-forward-button" class="reset-button" disabled="">&gt;</button>
+                </div>
+
                 <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
                 <button id="download-game-button" class="reset-button">Download Game</button>
-                <button id="download-gif-button" class="reset-button">Download GIF Animation</button>
+                <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
                 <button id="reset-game-button" class="reset-button">Reset Game</button>
                 <button id="go-home-button" class="reset-button">Home</button>
                 
@@ -461,12 +465,12 @@
             </div>
             <div id="notation-area" class="notation-area"></div>
         </div>
-        <div id="gif-output-area" style="display: none;">
-            <!-- Generated GIF will appear here -->
+        <div id="gif-output-area">
+            <!-- Content here if needed -->
         </div>
     </div>
 
-    <script id="savedGameStateData" type="application/json">{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"history":[{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false}],"useStandardPieces":false}</script>
+    <script id="savedGameStateData" type="application/json">{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"moveLog":[],"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"history":[{"board":[[{"type":"r","color":"black","id":"piece-0-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"q","color":"black","id":"piece-0-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"k","color":"black","id":"piece-0-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"b","color":"black","id":"piece-0-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"n","color":"black","id":"piece-0-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"r","color":"black","id":"piece-0-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"p","color":"black","id":"piece-1-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"p","color":"black","id":"piece-1-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[{"type":"P","color":"white","id":"piece-6-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"P","color":"white","id":"piece-6-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}],[{"type":"R","color":"white","id":"piece-7-0-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-1-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-2-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"Q","color":"white","id":"piece-7-3-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"K","color":"white","id":"piece-7-4-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"B","color":"white","id":"piece-7-5-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"N","color":"white","id":"piece-7-6-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false},{"type":"R","color":"white","id":"piece-7-7-1749178828090","isFrozen":false,"isJumpable":false,"hasMoved":false}]],"currentPlayer":"white","gameTurnNumber":1,"whitePlayerTurn":1,"blackPlayerTurn":1,"plyCount":0,"spells":{"white":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0},"black":{"jump":2,"freeze":5,"jumpLastUsedTurn":0,"freezeLastUsedTurn":0}},"activeSpells":[],"selectedPiece":null,"spellMode":null,"spellCaster":null,"spellActivationState":null,"pendingSpellNotation":null,"enPassantTarget":null,"castlingRights":{"white":{"K":true,"Q":true},"black":{"k":true,"q":true}},"isGameOver":false,"gameEndMessage":"","awaitingPromotion":null,"useStandardPieces":false,"currentHistoryViewIndex":0}],"useStandardPieces":false,"currentHistoryViewIndex":0}</script>
 
     <script id="home-page-script">
         const startGameButton = document.getElementById('start-game-button');
@@ -516,7 +520,8 @@
         const downloadGameButton = document.getElementById('download-game-button');
         const downloadGifButton = document.getElementById('download-gif-button');
         const togglePiecesButton = document.getElementById('toggle-pieces-button');
-        const gifOutputArea = document.getElementById('gif-output-area');
+        const historyBackButton = document.getElementById('history-back-button');
+        const historyForwardButton = document.getElementById('history-forward-button');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -570,7 +575,8 @@
                 gameEndMessage: "", 
                 awaitingPromotion: null,
                 history: [],
-                useStandardPieces: false 
+                useStandardPieces: false,
+                currentHistoryViewIndex: 0
             };
         }
 
@@ -595,37 +601,23 @@
             if (!forceNewGame && initialGameDataFromSave) {
                 gameState = deepCopyFullState(initialGameDataFromSave); 
                 useStandardPieces = gameState.useStandardPieces === undefined ? false : gameState.useStandardPieces; 
+                if (gameState.currentHistoryViewIndex === undefined) {
+                    gameState.currentHistoryViewIndex = gameState.history.length - 1;
+                }
                 initialGameDataFromSave = null; 
                 console.log("Game loaded from saved state.");
                 document.body.classList.remove('home-view');
                 document.body.classList.add('game-view');
+                 // Load the state pointed to by the history index
+                loadStateFromHistory(gameState.currentHistoryViewIndex, true);
             } else {
                 initializeGameState();
                 initializeBoardState();
                 const initialSnapshot = deepCopyGameStateForSnapshot(gameState); 
                 gameState.history.push(initialSnapshot);
+                gameState.currentHistoryViewIndex = 0;
                 console.log("New game started.");
-            }
-
-            gifOutputArea.style.display = 'none';
-            gifOutputArea.innerHTML = '';
-            promotionChoicesDiv.style.display = 'none';
-            applyPieceStyle();
-            updateSpellControls();
-            updateCancelButtonVisibility();
-            updateNotationDisplay();
-
-            if (gameState.isGameOver) {
-                updateStatus(gameState.gameEndMessage || "Game over.");
-            } else if (gameState.awaitingPromotion) {
-                updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-            } else {
-                let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                 if (gameState.board && gameState.board.length > 0 && 
-                    isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                    statusMsg += " Check!";
-                }
-                updateStatus(statusMsg);
+                loadStateFromHistory(0, true);
             }
         }
         
@@ -648,9 +640,10 @@
             applyPieceStyle();
         });
 
-
         document.getElementById('reset-game-button').addEventListener('click', () => resetGame(true)); 
         cancelButton.addEventListener('click', handleCancelAction); 
+        historyBackButton.addEventListener('click', handleHistoryBack);
+        historyForwardButton.addEventListener('click', handleHistoryForward);
 
         promotionChoicesDiv.addEventListener('click', function(event) {
             if (event.target.classList.contains('promotion-button') && gameState.awaitingPromotion) {
@@ -675,8 +668,12 @@
                 alert("Cannot download game while awaiting pawn promotion.");
                 return;
             }
-            gameState.useStandardPieces = useStandardPieces; 
+            // Ensure the saved state reflects the true latest state, not a historical view
             const stateToSave = deepCopyFullState(gameState);
+            stateToSave.currentHistoryViewIndex = stateToSave.history.length - 1;
+            loadStateFromHistory(stateToSave.currentHistoryViewIndex, false); // Temporarily load latest state into gameState for saving
+            stateToSave.useStandardPieces = useStandardPieces; 
+            
             const serializedState = JSON.stringify(stateToSave);
 
             const clonedDocument = document.cloneNode(true);
@@ -698,25 +695,25 @@
             link.href = URL.createObjectURL(blob);
             
             let filename = "Spell_chess.html"; 
-            if (gameState.moveLog.length > 0) {
-                const lastFullTurnEntryIndex = gameState.moveLog.length - 1;
-                let turnNumberForFile = gameState.moveLog[lastFullTurnEntryIndex].turn;
+            if (stateToSave.moveLog.length > 0) {
+                const lastFullTurnEntryIndex = stateToSave.moveLog.length - 1;
+                let turnNumberForFile = stateToSave.moveLog[lastFullTurnEntryIndex].turn;
                 let whiteMoveForFile = "";
                 let blackMoveForFile = "";
 
                 for(let i = lastFullTurnEntryIndex; i >=0; i--){
-                    if(gameState.moveLog[i].turn === turnNumberForFile && gameState.moveLog[i].player === 'white'){
-                        whiteMoveForFile = gameState.moveLog[i].notation.replace(/[#+=\s@]/g, '');
+                    if(stateToSave.moveLog[i].turn === turnNumberForFile && stateToSave.moveLog[i].player === 'white'){
+                        whiteMoveForFile = stateToSave.moveLog[i].notation.replace(/[#+=\s@]/g, '');
                         break;
                     }
-                     if(gameState.moveLog[i].turn < turnNumberForFile) break;
+                     if(stateToSave.moveLog[i].turn < turnNumberForFile) break;
                 }
                 for(let i = lastFullTurnEntryIndex; i >=0; i--){
-                     if(gameState.moveLog[i].turn === turnNumberForFile && gameState.moveLog[i].player === 'black'){
-                        blackMoveForFile = gameState.moveLog[i].notation.replace(/[#+=\s@]/g, '');
+                     if(stateToSave.moveLog[i].turn === turnNumberForFile && stateToSave.moveLog[i].player === 'black'){
+                        blackMoveForFile = stateToSave.moveLog[i].notation.replace(/[#+=\s@]/g, '');
                         break;
                     }
-                    if(gameState.moveLog[i].turn < turnNumberForFile) break;
+                    if(stateToSave.moveLog[i].turn < turnNumberForFile) break;
                 }
                 
                 filename = `${turnNumberForFile}`;
@@ -734,129 +731,63 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
+
+             // Restore the view to what the user was looking at
+            loadStateFromHistory(gameState.currentHistoryViewIndex, true);
         });
 
         downloadGifButton.addEventListener('click', async () => {
-            if (typeof GIF === 'undefined') {
-                alert('GIF library not loaded. Please check your internet connection and try again.');
-                return;
-            }
             if (gameState.awaitingPromotion) {
-                alert("Cannot generate GIF while awaiting pawn promotion.");
+                alert("Cannot generate GIF frames while awaiting pawn promotion.");
                 return;
             }
-            if (gameState.history.length <= 1 && gameState.plyCount === 0) {
-                alert("No moves have been made to generate a GIF.");
+            if (gameState.history.length <= 1 && gameState.plyCount === 0) { 
+                alert("No moves made to generate GIF frames.");
                 return;
             }
 
-            updateStatus("Preparing to generate GIF...");
+            updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
             downloadGifButton.disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
-
-            const originalGameStateSnapshotJSON = JSON.stringify(gameState);
-            const originalUseStandardPieces = useStandardPieces;
             
-            const restoreUI = () => {
-                const originalGameStateRestored = JSON.parse(originalGameStateSnapshotJSON);
-                for (const key in originalGameStateRestored) {
-                    if (Object.prototype.hasOwnProperty.call(originalGameStateRestored, key)) {
-                         gameState[key] = JSON.parse(JSON.stringify(originalGameStateRestored[key]));
-                    }
-                }
-                useStandardPieces = originalUseStandardPieces;
-                applyPieceStyle();
+            window.open('https://ezgif.com/maker', '_blank');
 
-                downloadGifButton.disabled = false;
-                 document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => {
-                    const isDisabledByGameLogic = (gameState.isGameOver || gameState.awaitingPromotion);
-                    if (btn.id === 'go-home-button' || btn.id === 'reset-game-button' || btn.id === 'download-game-button' || btn.id === 'toggle-pieces-button') {
-                        btn.disabled = false; 
-                    } else if (btn.id.includes('-spell') || btn.id === 'cancel-button') { 
-                        btn.disabled = isDisabledByGameLogic;
-                    }
-                });
-                updateSpellControls();
-                updateCancelButtonVisibility();
-                
-                if (gameState.isGameOver) {
-                    updateStatus(gameState.gameEndMessage || "Game over.");
-                } else if (gameState.awaitingPromotion) {
-                    updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-                } else {
-                    let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
-                    if (isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
-                        statusMsg += " Check!";
-                    }
-                    updateStatus(statusMsg);
-                }
-            };
+            const originalHistoryViewIndex = gameState.currentHistoryViewIndex;
             
             try {
-                const gif = new GIF({
-                    workers: 2,
-                    quality: 10,
-                    workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js',
-                    repeat: 0 // 0 for infinite loop
-                });
-
-                const tempGameStateForRender = {};
                 for (let i = 0; i < gameState.history.length; i++) {
-                    const historicalStateSnapshot = gameState.history[i];
-                    for (const key in historicalStateSnapshot) {
-                         if (Object.prototype.hasOwnProperty.call(historicalStateSnapshot, key)) {
-                            tempGameStateForRender[key] = JSON.parse(JSON.stringify(historicalStateSnapshot[key]));
-                        }
-                    }
-                    
-                    gameState.board = tempGameStateForRender.board;
-                    gameState.activeSpells = tempGameStateForRender.activeSpells || [];
-                    useStandardPieces = tempGameStateForRender.useStandardPieces === undefined ? originalUseStandardPieces : tempGameStateForRender.useStandardPieces;
+                    loadStateFromHistory(i, false); // Load state without full UI update
                     applyPieceStyle();
                     
-                    updateStatus(`Capturing frame ${i + 1} of ${gameState.history.length}...`);
-                    await new Promise(resolve => setTimeout(resolve, 10));
+                    updateStatus(`Downloading frame ${i + 1} of ${gameState.history.length}...`);
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
 
                     const canvas = await html2canvas(chessboardDiv, {
-                        allowTaint: true, useCORS: true, logging: false,
-                        width: chessboardDiv.offsetWidth, height: chessboardDiv.offsetHeight,
-                        backgroundColor: null
+                        allowTaint: true, 
+                        useCORS: true, 
+                        logging: false,
+                        width: chessboardDiv.offsetWidth,
+                        height: chessboardDiv.offsetHeight,
+                        backgroundColor: null 
                     });
-                    gif.addFrame(canvas, { delay: 500 });
+                    
+                    const link = document.createElement('a');
+                    link.download = `spell_chess_frame_${String(i).padStart(3, '0')}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link); 
+                    link.click();
+                    document.body.removeChild(link); 
+                    await new Promise(resolve => setTimeout(resolve, 250)); 
                 }
-
-                gif.on('finished', function(blob) {
-                    gifOutputArea.innerHTML = '';
-                    gifOutputArea.style.display = 'block';
-
-                    const url = URL.createObjectURL(blob);
-                    const img = document.createElement('img');
-                    img.src = url;
-
-                    const title = document.createElement('h3');
-                    title.textContent = 'Generated GIF Animation';
-
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = url;
-                    downloadLink.download = 'spell_chess_animation.gif';
-                    downloadLink.textContent = 'Download GIF';
-
-                    gifOutputArea.appendChild(title);
-                    gifOutputArea.appendChild(img);
-                    gifOutputArea.appendChild(document.createElement('br'));
-                    gifOutputArea.appendChild(downloadLink);
-
-                    updateStatus("GIF generated successfully. Scroll down to view.");
-                    restoreUI();
-                });
-
-                updateStatus(`Rendering GIF... This may take a moment.`);
-                gif.render();
+                updateStatus("All GIF frames downloaded. You can assemble them at ezgif.com.");
 
             } catch (error) {
-                console.error("Error during GIF generation:", error);
-                updateStatus("GIF generation failed. See console for details.");
-                restoreUI();
+                console.error("Error during GIF frame download process:", error);
+                updateStatus("GIF frame download failed.");
+            } finally {
+                // Restore the game to its original viewing state
+                loadStateFromHistory(originalHistoryViewIndex, true); 
+                downloadGifButton.disabled = false;
             }
         });
 
@@ -867,6 +798,10 @@
             } else {
                 chessboardDiv.classList.remove('colored-pieces');
             }
+            
+            // Highlight last move only if viewing the latest position
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            const lastMoveLogEntry = isViewingLatest && gameState.moveLog.length > 0 ? gameState.moveLog[gameState.moveLog.length - 1] : null;
 
             const validMovesForSelected = gameState.selectedPiece ? getValidMovesForPiece(gameState.selectedPiece.r, gameState.selectedPiece.c) : [];
 
@@ -881,6 +816,14 @@
                     square.classList.remove('active-freeze-zone', 'jumpable-on-square',
                                             'freeze-outline-top', 'freeze-outline-bottom',
                                             'freeze-outline-left', 'freeze-outline-right');
+                    
+                    if (lastMoveLogEntry) {
+                        const { fromR, toR, fromC, toC } = lastMoveLogEntry;
+                        if ((r_idx === fromR && c_idx === fromC) || (r_idx === toR && c_idx === toC)) {
+                             // This class doesn't exist, maybe add it to CSS?
+                             // square.classList.add('highlight-history');
+                        }
+                    }
 
                     if (isSquareUnderActiveFreeze(r_idx, c_idx, gameState.activeSpells, gameState.plyCount)) {
                         square.classList.add('active-freeze-zone');
@@ -957,6 +900,13 @@
         }
 
         function onSquareClick(r_clicked, c_clicked) {
+            // If we are viewing a past move, any click on the board should be interpreted as an intent to play from this point.
+            // But we only allow moves if it's the correct player's turn.
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            if (!isViewingLatest && !gameState.isGameOver) {
+                updateStatus("You are viewing a past move. Click '>' to return to the present or make a new move to create a new game line.");
+            }
+
             if (gameState.isGameOver || gameState.awaitingPromotion) { 
                 if (gameState.awaitingPromotion) updateStatus("Choose promotion piece.");
                 else updateStatus("Game is over. Please reset to play again.");
@@ -1073,7 +1023,7 @@
                     }
                     
                     const pieceToEndTurnWith = gameState.board[r_clicked][c_clicked] || movingPiece; 
-                    endTurn(moveNotation, pieceToEndTurnWith, fromR, r_clicked, fromC);
+                    endTurn(moveNotation, pieceToEndTurnWith, fromR, r_clicked, fromC, c_clicked);
                 } else if (pieceAtClickedSquare && pieceAtClickedSquare.color === gameState.currentPlayer) {
                     let effectivelyFrozenNewSelection = pieceAtClickedSquare.isFrozen || isSquareUnderActiveFreeze(r_clicked, c_clicked, gameState.activeSpells, gameState.plyCount);
                     if (effectivelyFrozenNewSelection) {
@@ -1329,7 +1279,7 @@
             return isSquareAttacked(kingPos.r, kingPos.c, attackerColor, board, enPassantTarget, activeSpells, currentPly);
         }
 
-        function hasLegalMoves(playerColor, board, enPassantTarget, currentCastlingRights, activeSpells, currentPly, playerSpellsState, playerGameTurn) {
+        function hasLegalMoves(playerColor, board, enPassantTarget, currentCastlingRights, activeSpells, currentPly, playerSpellsState, playerTurnNumberForCooldown) {
             // 1. Check for standard legal moves.
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
@@ -1350,11 +1300,12 @@
             }
 
             // If we are here, no standard moves save the player. Now check if spells can save them.
-            
-            // 2. Check if casting a JUMP spell can create a legal move.
-            const canCastJump = playerSpellsState.jump > 0 && (playerSpellsState.jumpLastUsedTurn === 0 || playerGameTurn >= playerSpellsState.jumpLastUsedTurn + 3);
+            // This is only relevant if the player is currently in check, which is determined by the calling function.
 
-            if (canCastJump) {
+            // 2. Check if casting a JUMP spell can create a legal move.
+            const canCastJump = playerSpellsState.jump > 0 && (playerSpellsState.jumpLastUsedTurn === 0 || playerTurnNumberForCooldown >= playerSpellsState.jumpLastUsedTurn + 3);
+
+            if (canCastJump && isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) {
                 // Iterate through every piece on the board to potentially make it jumpable
                 for (let jump_r = 0; jump_r < 8; jump_r++) {
                     for (let jump_c = 0; jump_c < 8; jump_c++) {
@@ -1374,6 +1325,7 @@
                                         // Check all possible destination squares for this piece
                                         for (let to_r = 0; to_r < 8; to_r++) {
                                             for (let to_c = 0; to_c < 8; to_c++) {
+                                                // isValidMove will check if the move is legal on the temp board AND if it gets the king out of check
                                                 if (isValidMove(move_r, move_c, to_r, to_c, tempBoardWithJump, playerColor, enPassantTarget, currentCastlingRights, activeSpells, currentPly)) {
                                                     return true; // Found a saving move via Jump spell
                                                 }
@@ -1387,8 +1339,8 @@
                 }
             }
 
-            // 3. Check if casting a FREEZE spell can create a legal move (only relevant if in check).
-            const canCastFreeze = playerSpellsState.freeze > 0 && (playerSpellsState.freezeLastUsedTurn === 0 || playerGameTurn >= playerSpellsState.freezeLastUsedTurn + 3);
+            // 3. Check if casting a FREEZE spell can create a legal move.
+            const canCastFreeze = playerSpellsState.freeze > 0 && (playerSpellsState.freezeLastUsedTurn === 0 || playerTurnNumberForCooldown >= playerSpellsState.freezeLastUsedTurn + 3);
 
             if (canCastFreeze && isKingInCheck(playerColor, board, enPassantTarget, activeSpells, currentPly)) {
                 for (let fr = 0; fr < 8; fr++) {
@@ -1411,6 +1363,7 @@
                                         if (!effectivelyFrozenByTempSpells) {
                                             for (let ptoR = 0; ptoR < 8; ptoR++) {
                                                 for (let ptoC = 0; ptoC < 8; ptoC++) {
+                                                    // Note: We use the original board here, but check validity against the new spell list
                                                     if (isValidMove(pr, pc, ptoR, ptoC, board, playerColor, enPassantTarget, currentCastlingRights, tempActiveSpells, currentPly + 1)) {
                                                         return true; // Found a legal move after being saved by a freeze spell
                                                     }
@@ -1522,6 +1475,12 @@
         }
 
         function activateSpellMode(type) {
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            if (!isViewingLatest) {
+                updateStatus("Cannot cast spells while viewing past moves. Go to the latest move.");
+                return;
+            }
+
             if (gameState.selectedPiece) { 
                 gameState.selectedPiece = null;
             }
@@ -1541,7 +1500,7 @@
             }
 
             const playerSpells = gameState.spells[gameState.currentPlayer];
-            const currentCastingGameTurn = gameState.gameTurnNumber;
+            const currentTurnForPlayerForCooldownCheck = gameState.gameTurnNumber;
             let count, lastUsedTurn, spellName;
 
             if (type === 'jump') {
@@ -1558,7 +1517,7 @@
                 updateStatus(`No ${spellName} spells left.`);
                 return;
             }
-            if (lastUsedTurn > 0 && currentCastingGameTurn < lastUsedTurn + 3) { 
+            if (lastUsedTurn > 0 && currentTurnForPlayerForCooldownCheck < lastUsedTurn + 3) { 
                 updateStatus(`${spellName} spell is on cooldown. Available on game turn ${lastUsedTurn + 3}.`);
                 return;
             }
@@ -1677,7 +1636,14 @@
             return null;
         }
 
-        function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param) {
+        function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
+            // If playing from a past move, truncate future history
+            const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            if (!isLatestMove) {
+                gameState.history = gameState.history.slice(0, gameState.currentHistoryViewIndex + 1);
+                gameState.moveLog = gameState.moveLog.filter(log => log.plySnapshotIndex <= gameState.currentHistoryViewIndex);
+            }
+
             const playerWhoMoved = gameState.currentPlayer; 
             
             gameState.plyCount++; 
@@ -1696,19 +1662,20 @@
                 const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                 gameEndMessage = `King captured! ${winner} wins!`;
             } else {
-                 const nextPlayerGameTurn = playerWhoMoved === 'white' ? gameState.gameTurnNumber : gameState.gameTurnNumber + 1;
-                 const nextPlayerSpells = gameState.spells[opponentColor];
-
                 if (isKingInCheck(opponentColor, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
                     isCheck = true;
-                    if (!hasLegalMoves(opponentColor, gameState.board, gameState.enPassantTarget, gameState.castlingRights, gameState.activeSpells, gameState.plyCount, nextPlayerSpells, nextPlayerGameTurn)) {
+                    const nextPlayerSpells = gameState.spells[opponentColor];
+                    const nextPlayerTurn = opponentColor === 'white' ? gameState.whitePlayerTurn : gameState.blackPlayerTurn + 1;
+                    if (!hasLegalMoves(opponentColor, gameState.board, gameState.enPassantTarget, gameState.castlingRights, gameState.activeSpells, gameState.plyCount, nextPlayerSpells, nextPlayerTurn)) {
                         isCheckmate = true;
                         gameState.isGameOver = true;
                         const winner = playerWhoMoved.charAt(0).toUpperCase() + playerWhoMoved.slice(1);
                         gameEndMessage = `Checkmate! ${winner} wins!`;
                     }
                 } else { 
-                    if (!hasLegalMoves(opponentColor, gameState.board, gameState.enPassantTarget, gameState.castlingRights, gameState.activeSpells, gameState.plyCount, nextPlayerSpells, nextPlayerGameTurn)) {
+                    const nextPlayerSpells = gameState.spells[opponentColor];
+                    const nextPlayerTurn = opponentColor === 'white' ? gameState.whitePlayerTurn : gameState.blackPlayerTurn + 1;
+                    if (!hasLegalMoves(opponentColor, gameState.board, gameState.enPassantTarget, gameState.castlingRights, gameState.activeSpells, gameState.plyCount, nextPlayerSpells, nextPlayerTurn)) {
                         gameState.isGameOver = true;
                         gameEndMessage = "Stalemate! Draw.";
                     }
@@ -1747,13 +1714,16 @@
             stateToSnapshot.plyCount = gameState.plyCount; 
             stateToSnapshot.gameEndMessage = gameState.isGameOver ? gameEndMessage : "";
             stateToSnapshot.useStandardPieces = useStandardPieces; 
-            gameState.history.push(stateToSnapshot); 
             
             gameState.moveLog.push({ 
                 turn: gameState.gameTurnNumber, 
                 player: playerWhoMoved, 
                 notation: finalMoveNotationWithSymbols, 
-                plySnapshotIndex: gameState.plyCount 
+                plySnapshotIndex: gameState.history.length, // point to the next state
+                fromR: fromR_param,
+                toR: toR_param,
+                fromC: fromC_param,
+                toC: toC_param,
             });
             
             gameState.enPassantTarget = null; 
@@ -1762,22 +1732,22 @@
             }
             gameState.spellActivationState = null; 
             gameState.spellCaster = null; 
-            
-            updateNotationDisplay(); 
 
-            if (gameState.isGameOver) {
-                updateStatus(gameEndMessage);
-            } else { 
+            // Update current state for the next turn BEFORE snapshotting
+            if (!gameState.isGameOver) {
                 gameState.currentPlayer = next_currentPlayer_state;
                 gameState.gameTurnNumber = next_gameTurnNumber_state;
                 gameState.whitePlayerTurn = next_whitePlayerTurn_state;
                 gameState.blackPlayerTurn = next_blackPlayerTurn_state;
-                updateStatus(`${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.` + (isCheck ? " Check!" : ""));
             }
+
+            // Snapshot the state AFTER the move and player switch
+            const afterMoveState = deepCopyGameStateForSnapshot(gameState);
+            afterMoveState.gameEndMessage = gameEndMessage;
+            gameState.history.push(afterMoveState);
+            gameState.currentHistoryViewIndex = gameState.history.length - 1;
             
-            updateSpellControls();
-            updateCancelButtonVisibility(); 
-            renderBoard(); 
+            loadStateFromHistory(gameState.currentHistoryViewIndex, true);
         }
         
         function handleNotationClick(plySnapshotIndex) {
@@ -1785,29 +1755,44 @@
                 updateStatus("Please choose a promotion piece first.");
                 return;
             }
-            if (plySnapshotIndex < 0 || plySnapshotIndex >= gameState.history.length) {
-                console.error("Invalid plySnapshotIndex for history:", plySnapshotIndex);
+            loadStateFromHistory(plySnapshotIndex, true);
+        }
+        
+        function handleHistoryBack() {
+            if (gameState.currentHistoryViewIndex > 0) {
+                loadStateFromHistory(gameState.currentHistoryViewIndex - 1, true);
+            }
+        }
+
+        function handleHistoryForward() {
+            if (gameState.currentHistoryViewIndex < gameState.history.length - 1) {
+                loadStateFromHistory(gameState.currentHistoryViewIndex + 1, true);
+            }
+        }
+
+        function loadStateFromHistory(historyIndex, performFullUpdate) {
+            if (historyIndex < 0 || historyIndex >= gameState.history.length) {
+                console.error("Invalid historyIndex:", historyIndex);
+                return;
+            }
+            
+            gameState.currentHistoryViewIndex = historyIndex;
+            const targetStateSnapshot = gameState.history[historyIndex];
+            if (!targetStateSnapshot) {
+                console.error("No state found in history for index:", historyIndex);
                 return;
             }
 
-            const targetStateSnapshot = gameState.history[plySnapshotIndex];
-            if (!targetStateSnapshot) {
-                 console.error("No state found in history for index:", plySnapshotIndex);
-                 return;
-            }
-            
-            const currentPieceStyleBeforeLoad = useStandardPieces; 
-
+            // Restore all keys from the snapshot
             const keysToRestore = [
-                'board', 'currentPlayer', 'gameTurnNumber', 'whitePlayerTurn', 
-                'blackPlayerTurn', 'plyCount', 'spells', 'activeSpells', 
-                'selectedPiece', 'spellMode', 'spellCaster', 'spellActivationState',
-                'pendingSpellNotation', 'enPassantTarget', 'castlingRights', 
-                'isGameOver', 'gameEndMessage', 'awaitingPromotion', 'useStandardPieces' 
+                'board', 'currentPlayer', 'gameTurnNumber', 'whitePlayerTurn', 'blackPlayerTurn', 
+                'plyCount', 'spells', 'activeSpells', 'enPassantTarget', 'castlingRights', 
+                'isGameOver', 'gameEndMessage', 'awaitingPromotion', 'useStandardPieces'
             ];
 
             for (const key of keysToRestore) {
-                if (Object.prototype.hasOwnProperty.call(targetStateSnapshot, key)) {
+                 if (Object.prototype.hasOwnProperty.call(targetStateSnapshot, key)) {
+                    // Deep copy objects to prevent mutation of history
                     if (typeof targetStateSnapshot[key] === 'object' && targetStateSnapshot[key] !== null) {
                         gameState[key] = JSON.parse(JSON.stringify(targetStateSnapshot[key]));
                     } else {
@@ -1816,25 +1801,36 @@
                 }
             }
             
-            useStandardPieces = gameState.useStandardPieces === undefined ? currentPieceStyleBeforeLoad : gameState.useStandardPieces;
+            // Reset transient states that are not part of history
+            gameState.selectedPiece = null;
+            gameState.spellMode = null;
+            gameState.spellCaster = null;
+            gameState.pendingSpellNotation = null;
             
-            gameState.history = gameState.history.slice(0, plySnapshotIndex + 1);
-            gameState.moveLog = gameState.moveLog.filter(logEntry => logEntry.plySnapshotIndex <= plySnapshotIndex);
-
-            gifOutputArea.style.display = 'none'; 
-            gifOutputArea.innerHTML = '';
-            
-            applyPieceStyle(); 
+            if (performFullUpdate) {
+                useStandardPieces = gameState.useStandardPieces === undefined ? useStandardPieces : gameState.useStandardPieces;
+                applyPieceStyle();
+                updateAllUI();
+            }
+        }
+        
+        function updateAllUI() {
+            updateStatusMessage();
             updateSpellControls();
-            updateCancelButtonVisibility(); 
-            updateNotationDisplay();    
+            updateCancelButtonVisibility();
+            updateNavigationButtons();
+            updateNotationDisplay();
+            renderBoard();
+        }
 
-            if (gameState.isGameOver) {
-                updateStatus(gameState.gameEndMessage || "Game over at this point.");
+        function updateStatusMessage() {
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+
+            if (gameState.isGameOver && isViewingLatest) {
+                updateStatus(gameState.gameEndMessage || "Game over.");
             } else if (gameState.awaitingPromotion) {
                  updateStatus(`Choose promotion for pawn at ${String.fromCharCode(97 + gameState.awaitingPromotion.c)}${8 - gameState.awaitingPromotion.r}.`);
-            }
-            else {
+            } else {
                 let statusMsg = `${gameState.currentPlayer.charAt(0).toUpperCase() + gameState.currentPlayer.slice(1)}'s turn.`;
                 if (gameState.board && gameState.board.length > 0 && 
                     isKingInCheck(gameState.currentPlayer, gameState.board, gameState.enPassantTarget, gameState.activeSpells, gameState.plyCount)) {
@@ -1868,7 +1864,10 @@
                 moveSpan.classList.add('notation-move');
                 moveSpan.textContent = moveEntry.notation; 
                 moveSpan.dataset.plySnapshotIndex = moveEntry.plySnapshotIndex;
-                moveSpan.addEventListener('click', () => handleNotationClick(parseInt(moveSpan.dataset.plySnapshotIndex)));
+                if (moveEntry.plySnapshotIndex === gameState.currentHistoryViewIndex) {
+                    moveSpan.classList.add('current-move');
+                }
+                moveSpan.addEventListener('click', () => handleNotationClick(parseInt(moveSpan.dataset.plySnapshotIndex, 10)));
                 
                 if (currentTurnDiv) { 
                     currentTurnDiv.appendChild(moveSpan);
@@ -1898,7 +1897,8 @@
             }
             promotionChoicesDiv.style.display = 'none';
 
-            if (!gameState.isGameOver && (gameState.spellMode || gameState.pendingSpellNotation)) {
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            if (isViewingLatest && !gameState.isGameOver && (gameState.spellMode || gameState.pendingSpellNotation)) {
                 cancelButton.style.display = 'block';
                 if (gameState.spellMode || gameState.pendingSpellNotation) { 
                     cancelButton.textContent = "Cancel Spell";
@@ -1910,13 +1910,19 @@
                 cancelButton.textContent = "Cancel"; 
             }
         }
+        
+        function updateNavigationButtons() {
+            historyBackButton.disabled = gameState.currentHistoryViewIndex <= 0;
+            historyForwardButton.disabled = gameState.currentHistoryViewIndex >= gameState.history.length - 1;
+        }
 
         function updateSpellControls() {
-            const disableControls = gameState.awaitingPromotion || gameState.isGameOver;
+            const isViewingLatest = gameState.currentHistoryViewIndex === gameState.history.length - 1;
+            const disableControls = gameState.awaitingPromotion || gameState.isGameOver || !isViewingLatest;
 
             ['white', 'black'].forEach(player => {
                 const spells = gameState.spells[player];
-                const currentCastingGameTurn = gameState.gameTurnNumber;
+                const currentCastingGameTurnForCheck = gameState.gameTurnNumber;
 
                 const jumpBtn = document.getElementById(`${player}-jump-spell`);
                 const jumpCooldownEl = document.getElementById(`${player}-jump-cooldown`);
@@ -1929,7 +1935,7 @@
                                    (gameState.spellMode && gameState.spellMode !== 'jump' && gameState.spellCaster === player);
                 let jumpCooldownText = spells.jump > 0 ? "Ready" : "No spells left";
 
-                if (spells.jumpLastUsedTurn > 0 && currentCastingGameTurn < spells.jumpLastUsedTurn + 3) {
+                if (spells.jumpLastUsedTurn > 0 && currentCastingGameTurnForCheck < spells.jumpLastUsedTurn + 3) {
                     jumpDisabled = true; 
                     jumpCooldownText = `Cooldown until turn ${spells.jumpLastUsedTurn + 3}`;
                 }
@@ -1948,7 +1954,7 @@
                                      (gameState.spellMode && gameState.spellMode !== 'freeze' && gameState.spellCaster === player);
                 let freezeCooldownText = spells.freeze > 0 ? "Ready" : "No spells left";
 
-                if (spells.freezeLastUsedTurn > 0 && currentCastingGameTurn < spells.freezeLastUsedTurn + 3) {
+                if (spells.freezeLastUsedTurn > 0 && currentCastingGameTurnForCheck < spells.freezeLastUsedTurn + 3) {
                     freezeDisabled = true;
                     freezeCooldownText = `Cooldown until turn ${spells.freezeLastUsedTurn + 3}`;
                 }
@@ -1971,9 +1977,6 @@
                     console.error("Error parsing saved game data:", e);
                     initialGameDataFromSave = null;
                 }
-            } else {
-                 mainBody.classList.remove('game-view'); 
-                 mainBody.classList.add('home-view');
             }
             resetGame(); 
         });
