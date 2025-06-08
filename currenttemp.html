@@ -55,6 +55,7 @@
         }
          body.game-view #announcement-box { 
             display: block; 
+            position: relative;
             width: 100%;
             max-width: 1100px; 
             margin: 0 auto 20px auto; 
@@ -65,7 +66,6 @@
             text-align: center;
             font-size: 0.95em;
             line-height: 1.6;
-            position: relative;
         }
         #announcement-box h3 {
             margin-top: 0;
@@ -79,22 +79,21 @@
         #announcement-box a:hover {
             text-decoration: underline;
         }
-        .close-button {
+        #close-announcement-button {
             position: absolute;
             top: 5px;
             right: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #aaa;
-            cursor: pointer;
             background: none;
             border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
             line-height: 1;
         }
-        .close-button:hover {
-            color: #333;
+        #close-announcement-button:hover {
+            color: #000;
         }
-
 
         #home-page-content h1 {
             margin-bottom: 30px;
@@ -235,7 +234,7 @@
             gap: 10px;
             flex-shrink: 0;
         }
-        .player-info { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .player-info { padding: 10px 10px 5px 10px; border: 1px solid #ccc; border-radius: 5px; }
         .player-info h3 { margin-top: 0; margin-bottom: 5px; text-align: center;}
         .spell-button, .reset-button, .promotion-button, .options-button { 
             padding: 8px 12px;
@@ -357,6 +356,7 @@
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
             top: 100%; /* Position below the button */
+            left: 0;
             margin-top: 5px;
         }
         .dropdown-content button {
@@ -372,7 +372,7 @@
             border-bottom: none;
         }
         .dropdown-content button:hover {background-color: #ddd;}
-        /* REMOVED .options-dropdown:hover .dropdown-content rule */
+        /* REMOVED: .options-dropdown:hover .dropdown-content {display: block;} */
 
         #promotion-choices {
             margin-top: 10px;
@@ -622,7 +622,7 @@
             }
         });
 
-        goHomeButton.addEventListener('click', function() {
+        document.getElementById('go-home-button').addEventListener('click', function() {
             mainBody.classList.remove('game-view');
             mainBody.classList.add('home-view');
         });
@@ -900,7 +900,7 @@
             }
 
             updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
-            downloadGifButton.disabled = true;
+            document.getElementById('download-gif-button').disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
             window.open('https://ezgif.com/maker', '_blank');
@@ -940,7 +940,7 @@
             } finally {
                 // Restore the game to its original viewing state
                 loadStateFromHistory(originalHistoryViewIndex, true); 
-                downloadGifButton.disabled = false;
+                document.getElementById('download-gif-button').disabled = false;
             }
         });
 
@@ -2146,8 +2146,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const gameData = urlParams.get('game');
             
-            const mainBody = document.body;
-            
             document.addEventListener('keydown', (event) => {
                 if (event.target.tagName === 'INPUT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'TEXTAREA') {
                     return;
@@ -2165,7 +2163,7 @@
                 try {
                     const compactString = atob(decodeURIComponent(gameData));
                     resetGame(true); // Start fresh before importing
-                    processImportFromCompactString(compactString);
+                    processImportFromCompactString(compactString).then(() => document.body.focus());
                 } catch(e) {
                     console.error("Failed to load game from URL:", e);
                     alert("Could not load game from URL. The link may be corrupted. Starting a new game.");
@@ -2173,6 +2171,8 @@
                 }
             } else {
                 const savedDataScript = document.getElementById('savedGameStateData');
+                const mainBody = document.body; 
+
                 if (savedDataScript && savedDataScript.textContent.trim() !== "") {
                     try {
                         initialGameDataFromSave = JSON.parse(savedDataScript.textContent);
@@ -2339,7 +2339,7 @@
         }
 
         function findMoveFromSAN(san) {
-            // Handle Castling first, as it's a unique notation
+             // Handle Castling first, as it's a unique notation
             if (san.startsWith('O-O-O') || san.startsWith('0-0-0')) {
                 const r = gameState.currentPlayer === 'white' ? 7 : 0;
                 return { fromR: r, fromC: 4, toR: r, toC: 2 };
@@ -2479,16 +2479,19 @@
         
         // Dropdown Menu Logic
         optionsToggleButton.addEventListener('click', function(event) {
-            optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
+            const isDisplayed = optionsContent.style.display === 'block';
+            optionsContent.style.display = isDisplayed ? 'none' : 'block';
             event.stopPropagation();
         });
 
         window.addEventListener('click', function(event) {
-            if (!event.target.matches('.options-button') && optionsContent.style.display === 'block') {
-                optionsContent.style.display = 'none';
+            if (!event.target.matches('.options-button')) {
+                if (optionsContent.style.display === 'block') {
+                    optionsContent.style.display = 'none';
+                }
             }
         });
-        
+
         closeAnnouncementButton.addEventListener('click', () => {
             announcementBox.style.display = 'none';
         });
