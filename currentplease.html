@@ -221,7 +221,7 @@
         }
         .player-info { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
         .player-info h3 { margin-top: 0; margin-bottom: 5px; text-align: center;}
-        .spell-button, .reset-button, .promotion-button, .options-button { 
+        .spell-button, .reset-button, .promotion-button { 
             padding: 8px 12px;
             cursor: pointer;
             border: 1px solid #555;
@@ -232,7 +232,7 @@
         .promotion-button {
             margin-bottom: 5px;
         }
-        .spell-button:disabled, .reset-button:disabled, .options-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
+        .spell-button:disabled, .reset-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
         .spell-button.targeting { background-color: #add8e6; }
         
         .spell-container { margin-bottom: 10px; }
@@ -534,21 +534,24 @@
                     <button id="history-forward-button-desktop" class="reset-button nav-button" disabled="">&gt;</button>
                     <button id="copy-notation-button-desktop" class="reset-button icon-button">📋</button>
                 </div>
-                 <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
+                <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
                 <button id="import-game-button" class="reset-button">Import Game</button>
-                 <div id="import-game-area">
+                <div id="import-game-area">
                     <textarea id="import-game-textarea" placeholder="Paste game notation here..."></textarea>
                     <div class="import-controls">
                         <button id="load-game-button" class="reset-button">Load Game</button>
                         <button id="cancel-import-button" class="reset-button">Cancel</button>
                     </div>
                 </div>
-                <div class="options-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                    <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
-                    <button id="download-game-button" class="reset-button">Download Game</button>
-                    <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
-                    <button id="reset-game-button" class="reset-button">Reset Game</button>
-                    <button id="go-home-button" class="reset-button">Home</button>
+                <div class="options-dropdown">
+                    <button id="options-toggle-button" class="options-button">⚙️ Options</button>
+                    <div id="options-content" class="dropdown-content">
+                        <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
+                        <button id="download-game-button" class="reset-button">Download Game</button>
+                        <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
+                        <button id="reset-game-button" class="reset-button">Reset Game</button>
+                        <button id="go-home-button" class="reset-button">Home</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -615,6 +618,8 @@
         const loadGameButton = document.getElementById('load-game-button');
         const cancelImportButton = document.getElementById('cancel-import-button');
         const importGameTextarea = document.getElementById('import-game-textarea');
+        const optionsToggleButton = document.getElementById('options-toggle-button');
+        const optionsContent = document.getElementById('options-content');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -1497,16 +1502,15 @@
                 const fromRank = (8 - fromR).toString();
 
                 const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
+                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
                 
-                if (sameFileCompetitors.length === 0) {
-                    notation += fromFile; // Unique file is enough
+                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
+                     notation += fromFile + fromRank; // Both file and rank are needed
+                }
+                else if (sameFileCompetitors.length > 0) {
+                    notation += fromRank; // Rooks on same file, use rank
                 } else {
-                    const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
-                     if (sameRankCompetitors.length === 0) {
-                         notation += fromRank; // Same file, but unique rank
-                     } else {
-                         notation += fromFile + fromRank; // Both file and rank are needed
-                     }
+                    notation += fromFile; // Default to file
                 }
             }
             
@@ -1559,7 +1563,7 @@
                     for (let dc = -1; dc <= 1; dc++) {
                         const nr = freezeCenterR + dr; 
                         const nc = freezeCenterC + dc; 
-                        if (nr >= 0 && nc >= 0 && nr < 8 && nc < 8) { 
+                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { 
                             const pieceToFreeze = gameState.board[nr][nc];
                             if (pieceToFreeze) {
                                 affectedPieceIds.push(pieceToFreeze.id);
@@ -1738,6 +1742,21 @@
                 }
             }
             return null;
+        }
+
+        function generateStateSignature(state) {
+            const boardString = state.board.map(row => 
+                row.map(p => {
+                    if (!p) return ' ';
+                    let char = p.type;
+                    if(p.isJumpable) char += '*';
+                    return char;
+                }).join('')
+            ).join('/');
+            
+            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
+
+            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
         }
         
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
@@ -2375,7 +2394,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = "Get Custom Game Link";
+                    getLinkButton.textContent = originalText;
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
@@ -2424,6 +2443,19 @@
             }
             updateStatus("Game loaded from URL successfully!");
         }
+        
+        // Dropdown Menu Logic
+        optionsToggleButton.addEventListener('click', function(event) {
+            optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
+            event.stopPropagation();
+        });
+
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.options-button') && optionsContent.style.display === 'block') {
+                optionsContent.style.display = 'none';
+            }
+        });
+
 
     </script>
 
