@@ -327,36 +327,6 @@
             color: white;
             text-decoration: none;
         }
-        
-        .options-dropdown {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            width: 100%;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 10;
-            bottom: 100%; /* Position above the button */
-            margin-bottom: 5px;
-        }
-        .dropdown-content button {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-            border: none;
-            border-bottom: 1px solid #ddd;
-        }
-        .dropdown-content button:last-child {
-            border-bottom: none;
-        }
-        .dropdown-content button:hover {background-color: #ddd;}
-        .options-dropdown:hover .dropdown-content {display: block;}
 
         #promotion-choices {
             margin-top: 10px;
@@ -564,24 +534,21 @@
                     <button id="history-forward-button-desktop" class="reset-button nav-button" disabled="">&gt;</button>
                     <button id="copy-notation-button-desktop" class="reset-button icon-button">📋</button>
                 </div>
-                <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
+                 <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
                 <button id="import-game-button" class="reset-button">Import Game</button>
-                <div id="import-game-area">
+                 <div id="import-game-area">
                     <textarea id="import-game-textarea" placeholder="Paste game notation here..."></textarea>
                     <div class="import-controls">
                         <button id="load-game-button" class="reset-button">Load Game</button>
                         <button id="cancel-import-button" class="reset-button">Cancel</button>
                     </div>
                 </div>
-                <div class="options-dropdown">
-                    <button id="options-toggle-button" class="options-button">⚙️ Options</button>
-                    <div id="options-content" class="dropdown-content">
-                        <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
-                        <button id="download-game-button" class="reset-button">Download Game</button>
-                        <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
-                        <button id="reset-game-button" class="reset-button">Reset Game</button>
-                        <button id="go-home-button" class="reset-button">Home</button>
-                    </div>
+                <div class="options-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
+                    <button id="download-game-button" class="reset-button">Download Game</button>
+                    <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
+                    <button id="reset-game-button" class="reset-button">Reset Game</button>
+                    <button id="go-home-button" class="reset-button">Home</button>
                 </div>
             </div>
         </div>
@@ -648,8 +615,6 @@
         const loadGameButton = document.getElementById('load-game-button');
         const cancelImportButton = document.getElementById('cancel-import-button');
         const importGameTextarea = document.getElementById('import-game-textarea');
-        const optionsToggleButton = document.getElementById('options-toggle-button');
-        const optionsContent = document.getElementById('options-content');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -881,7 +846,7 @@
             }
 
             updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
-            downloadGifButton.disabled = true;
+            document.getElementById('download-gif-button').disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
             window.open('https://ezgif.com/maker', '_blank');
@@ -921,7 +886,7 @@
             } finally {
                 // Restore the game to its original viewing state
                 loadStateFromHistory(originalHistoryViewIndex, true); 
-                downloadGifButton.disabled = false;
+                document.getElementById('download-gif-button').disabled = false;
             }
         });
 
@@ -1532,15 +1497,16 @@
                 const fromRank = (8 - fromR).toString();
 
                 const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
-                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
                 
-                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
-                     notation += fromFile + fromRank; // Both file and rank are needed
-                }
-                else if (sameFileCompetitors.length > 0) {
-                    notation += fromRank; // Rooks on same file, use rank
+                if (sameFileCompetitors.length === 0) {
+                    notation += fromFile; // Unique file is enough
                 } else {
-                    notation += fromFile; // Default to file
+                    const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
+                     if (sameRankCompetitors.length === 0) {
+                         notation += fromRank; // Same file, but unique rank
+                     } else {
+                         notation += fromFile + fromRank; // Both file and rank are needed
+                     }
                 }
             }
             
@@ -1593,7 +1559,7 @@
                     for (let dc = -1; dc <= 1; dc++) {
                         const nr = freezeCenterR + dr; 
                         const nc = freezeCenterC + dc; 
-                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) { 
+                        if (nr >= 0 && nc >= 0 && nr < 8 && nc < 8) { 
                             const pieceToFreeze = gameState.board[nr][nc];
                             if (pieceToFreeze) {
                                 affectedPieceIds.push(pieceToFreeze.id);
@@ -1772,21 +1738,6 @@
                 }
             }
             return null;
-        }
-
-        function generateStateSignature(state) {
-            const boardString = state.board.map(row => 
-                row.map(p => {
-                    if (!p) return ' ';
-                    let char = p.type;
-                    if(p.isJumpable) char += '*';
-                    return char;
-                }).join('')
-            ).join('/');
-            
-            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
-
-            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
         }
         
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
@@ -2424,7 +2375,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = originalText;
+                    getLinkButton.textContent = "Get Custom Game Link";
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
@@ -2473,19 +2424,6 @@
             }
             updateStatus("Game loaded from URL successfully!");
         }
-        
-        // Dropdown Menu Logic
-        optionsToggleButton.addEventListener('click', function(event) {
-            optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
-            event.stopPropagation();
-        });
-
-        window.addEventListener('click', function(event) {
-            if (!event.target.matches('.options-button') && optionsContent.style.display === 'block') {
-                optionsContent.style.display = 'none';
-            }
-        });
-
 
     </script>
 
