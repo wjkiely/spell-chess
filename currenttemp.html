@@ -220,8 +220,8 @@
             flex-shrink: 0;
         }
         .player-info { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .player-info h3 { margin-top: 0; margin-bottom: 5px; text-align: center;}
-        .spell-button, .reset-button, .promotion-button, .options-button { 
+        .player-info h3 { margin-top: 0; text-align: center;}
+        .spell-button, .reset-button, .promotion-button { 
             padding: 8px 12px;
             cursor: pointer;
             border: 1px solid #555;
@@ -232,7 +232,7 @@
         .promotion-button {
             margin-bottom: 5px;
         }
-        .spell-button:disabled, .reset-button:disabled, .options-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
+        .spell-button:disabled, .reset-button:disabled { cursor: not-allowed; background-color: #ccc; color: #777; }
         .spell-button.targeting { background-color: #add8e6; }
         
         .spell-container { margin-bottom: 10px; }
@@ -266,7 +266,7 @@
 
         .navigation-controls {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             width: 100%;
             flex-wrap: nowrap;
             align-items: center;
@@ -277,7 +277,7 @@
             font-size: 1.2em;
             font-weight: bold;
         }
-        .navigation-controls .icon-button {
+        #copy-notation-button-desktop, #copy-notation-button-mobile {
             flex: 0 0 auto; /* Don't grow or shrink */
             width: 36px;
             height: 36px;
@@ -297,11 +297,9 @@
         .notation-area {
             padding: 10px;
             border: 1px solid #ccc;
-            height: 240px; /* Reduced height */
+            height: 480px; 
             overflow-y: auto;
-            resize: vertical; /* Make it resizable */
             background-color: #f8f9fa;
-            min-height: 100px;
         }
         .notation-area .notation-line {
             margin-bottom: 2px;
@@ -327,36 +325,6 @@
             color: white;
             text-decoration: none;
         }
-        
-        .options-dropdown {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            width: 100%;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 10;
-            top: 100%; /* Position below the button */
-            margin-top: 5px; /* Add some space */
-        }
-        .dropdown-content button {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-            border: none;
-            border-bottom: 1px solid #ddd;
-        }
-        .dropdown-content button:last-child {
-            border-bottom: none;
-        }
-        .dropdown-content button:hover {background-color: #ddd;}
-        .options-dropdown:hover .dropdown-content {display: block;}
 
         #promotion-choices {
             margin-top: 10px;
@@ -497,7 +465,7 @@
                  <div id="mobile-navigation-controls" class="navigation-controls">
                     <button id="history-back-button-mobile" class="reset-button nav-button" disabled="">&lt;</button>
                     <button id="history-forward-button-mobile" class="reset-button nav-button" disabled="">&gt;</button>
-                    <button id="copy-notation-button-mobile" class="reset-button icon-button">📋</button>
+                    <button id="copy-notation-button-mobile" class="reset-button">📋</button>
                 </div>
                 <div id="status-area" class="status-area">White's turn.</div>
                 <div id="rules-area" class="rules-area">
@@ -549,6 +517,21 @@
                         <div id="white-freeze-icons" class="spell-icon-container"></div>
                     </div>
                 </div>
+
+                <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
+                <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
+                <button id="import-game-button" class="reset-button">Import Game</button>
+                <div id="import-game-area">
+                    <textarea id="import-game-textarea" placeholder="Paste game notation here..."></textarea>
+                    <div class="import-controls">
+                        <button id="load-game-button" class="reset-button">Load Game</button>
+                        <button id="cancel-import-button" class="reset-button">Cancel</button>
+                    </div>
+                </div>
+                <button id="download-game-button" class="reset-button">Download Game</button>
+                <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
+                <button id="reset-game-button" class="reset-button">Reset Game</button>
+                <button id="go-home-button" class="reset-button">Home</button>
                 
                 <div id="promotion-choices" style="display:none;">
                     <button class="promotion-button" data-promote="Q">Promote to Queen</button>
@@ -562,26 +545,7 @@
                 <div class="navigation-controls">
                     <button id="history-back-button-desktop" class="reset-button nav-button" disabled="">&lt;</button>
                     <button id="history-forward-button-desktop" class="reset-button nav-button" disabled="">&gt;</button>
-                    <button id="copy-notation-button-desktop" class="reset-button icon-button">📋</button>
-                </div>
-                <button id="get-link-button" class="reset-button">Get Custom Game Link</button>
-                <button id="import-game-button" class="reset-button">Import Game</button>
-                <div id="import-game-area">
-                    <textarea id="import-game-textarea" placeholder="Paste game notation here..."></textarea>
-                    <div class="import-controls">
-                        <button id="load-game-button" class="reset-button">Load Game</button>
-                        <button id="cancel-import-button" class="reset-button">Cancel</button>
-                    </div>
-                </div>
-                <div class="options-dropdown">
-                    <button id="options-toggle-button" class="options-button">⚙️ Options</button>
-                    <div id="options-content" class="dropdown-content">
-                        <button id="toggle-pieces-button" class="reset-button">Use Standard Pieces</button>
-                        <button id="download-game-button" class="reset-button">Download Game</button>
-                        <button id="download-gif-button" class="reset-button">Download GIF Frames</button>
-                        <button id="reset-game-button" class="reset-button">Reset Game</button>
-                        <button id="go-home-button" class="reset-button">Home</button>
-                    </div>
+                    <button id="copy-notation-button-desktop" class="reset-button">📋</button>
                 </div>
             </div>
         </div>
@@ -637,6 +601,9 @@
         const notationArea = document.getElementById('notation-area');
         const cancelButton = document.getElementById('cancel-button'); 
         const promotionChoicesDiv = document.getElementById('promotion-choices');
+        const downloadGameButton = document.getElementById('download-game-button');
+        const downloadGifButton = document.getElementById('download-gif-button');
+        const togglePiecesButton = document.getElementById('toggle-pieces-button');
         
         const historyBackButtons = [document.getElementById('history-back-button-desktop'), document.getElementById('history-back-button-mobile')];
         const historyForwardButtons = [document.getElementById('history-forward-button-desktop'), document.getElementById('history-forward-button-mobile')];
@@ -648,8 +615,6 @@
         const loadGameButton = document.getElementById('load-game-button');
         const cancelImportButton = document.getElementById('cancel-import-button');
         const importGameTextarea = document.getElementById('import-game-textarea');
-        const optionsToggleButton = document.getElementById('options-toggle-button');
-        const optionsContent = document.getElementById('options-content');
 
 
         function deepCopyGameStateForSnapshot(sourceState) { 
@@ -747,8 +712,6 @@
                 initializeBoardState();
                 const initialSnapshot = deepCopyGameStateForSnapshot(gameState); 
                 gameState.history.push(initialSnapshot);
-                const signature = generateStateSignature(initialSnapshot);
-                gameState.repetitionCounter[signature] = 1;
                 gameState.currentHistoryViewIndex = 0;
                 console.log("New game started.");
                 loadStateFromHistory(0, true);
@@ -758,17 +721,17 @@
         function applyPieceStyle() {
             if (useStandardPieces) {
                 chessboardDiv.classList.remove('colored-pieces');
-                document.getElementById('toggle-pieces-button').textContent = "Use Colored Pieces";
+                togglePiecesButton.textContent = "Use Colored Pieces";
             } else {
                 chessboardDiv.classList.add('colored-pieces');
-                document.getElementById('toggle-pieces-button').textContent = "Use Standard Pieces";
+                togglePiecesButton.textContent = "Use Standard Pieces";
             }
             if(gameState && gameState.board && gameState.board.length > 0) { 
                renderBoard();
             }
         }
         
-        document.getElementById('toggle-pieces-button').addEventListener('click', () => {
+        togglePiecesButton.addEventListener('click', () => {
             useStandardPieces = !useStandardPieces;
             gameState.useStandardPieces = useStandardPieces; 
             applyPieceStyle();
@@ -797,7 +760,7 @@
             }
         });
 
-        document.getElementById('download-game-button').addEventListener('click', () => { 
+        downloadGameButton.addEventListener('click', () => { 
             if (gameState.awaitingPromotion) {
                 alert("Cannot download game while awaiting pawn promotion.");
                 return;
@@ -870,7 +833,7 @@
             loadStateFromHistory(gameState.currentHistoryViewIndex, true);
         });
 
-        document.getElementById('download-gif-button').addEventListener('click', async () => {
+        downloadGifButton.addEventListener('click', async () => {
             if (gameState.awaitingPromotion) {
                 alert("Cannot generate GIF frames while awaiting pawn promotion.");
                 return;
@@ -881,7 +844,7 @@
             }
 
             updateStatus("Preparing to download GIF frames... Please allow multiple downloads if prompted.");
-            document.getElementById('download-gif-button').disabled = true;
+            downloadGifButton.disabled = true;
             document.querySelectorAll('.controls button:not(#download-gif-button)').forEach(btn => btn.disabled = true);
             
             window.open('https://ezgif.com/maker', '_blank');
@@ -921,7 +884,7 @@
             } finally {
                 // Restore the game to its original viewing state
                 loadStateFromHistory(originalHistoryViewIndex, true); 
-                document.getElementById('download-gif-button').disabled = false;
+                downloadGifButton.disabled = false;
             }
         });
 
@@ -1531,16 +1494,33 @@
                 const fromFile = String.fromCharCode(97 + fromC);
                 const fromRank = (8 - fromR).toString();
 
-                const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
-                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
+                const allOnSameFile = competitors.every(comp => comp.c === fromC);
+                const allOnSameRank = competitors.every(comp => comp.r === fromR);
+                const needsFile = !competitors.every(comp => comp.c !== fromC);
+                const needsRank = !competitors.every(comp => comp.r !== fromR);
                 
-                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
-                     notation += fromFile + fromRank; // Both file and rank are needed
+                if (needsFile) {
+                    if (needsRank || allOnSameFile) { // if all on same file, rank is required
+                         notation += fromRank;
+                    } else {
+                        notation += fromFile; // Only file is needed
+                    }
                 }
-                else if (sameFileCompetitors.length > 0) {
-                    notation += fromRank; // Rooks on same file, use rank
-                } else {
-                    notation += fromFile; // Default to file
+                 // Special case: if files are different, but ranks are same, still might need file
+                if (!needsFile && needsRank) {
+                    notation += fromFile;
+                }
+                 // Final fallback for super rare cases (3+ pieces)
+                if (notation.length === 1 && (needsFile || needsRank)) {
+                    if(competitors.some(c => c.c === fromC)) { // if any competitor shares the file
+                        notation += fromRank;
+                    } else {
+                        notation += fromFile;
+                    }
+                }
+
+                if(competitors.some(c => c.c === fromC) && competitors.some(c => c.r === fromR)) {
+                     notation = pieceTypeUpper + fromFile + fromRank;
                 }
             }
             
@@ -1774,6 +1754,21 @@
             return null;
         }
 
+        function generateStateSignature(state) {
+            const boardString = state.board.map(row => 
+                row.map(p => {
+                    if (!p) return ' ';
+                    let char = p.type;
+                    if(p.isJumpable) char += '*';
+                    return char;
+                }).join('')
+            ).join('/');
+            
+            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
+
+            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
+        }
+        
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
             const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
@@ -2321,7 +2316,7 @@
         }
 
         function findMoveFromSAN(san) {
-            // Handle Castling first, as it's a unique notation
+             // Handle Castling first, as it's a unique notation
             if (san.startsWith('O-O-O') || san.startsWith('0-0-0')) {
                 const r = gameState.currentPlayer === 'white' ? 7 : 0;
                 return { fromR: r, fromC: 4, toR: r, toC: 2 };
@@ -2394,7 +2389,7 @@
         }
         
         getLinkButton.addEventListener('click', () => {
-            const baseURL = 'https://wjkiely.github.io/spell-chess/current.html';
+            const baseURL = 'https://wjkiely.github.io/spell-chess/custom.html';
             if (gameState.moveLog.length === 0) {
                 updateStatus("No moves to create a link from.");
                 return;
@@ -2409,7 +2404,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = "Get Custom Game Link";
+                    getLinkButton.textContent = originalText;
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
@@ -2458,19 +2453,6 @@
             }
             updateStatus("Game loaded from URL successfully!");
         }
-        
-        // Dropdown Menu Logic
-        optionsToggleButton.addEventListener('click', function(event) {
-            optionsContent.style.display = optionsContent.style.display === 'block' ? 'none' : 'block';
-            event.stopPropagation();
-        });
-
-        window.addEventListener('click', function(event) {
-            if (!event.target.matches('.options-button') && optionsContent.style.display === 'block') {
-                optionsContent.style.display = 'none';
-            }
-        });
-
 
     </script>
 
