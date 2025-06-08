@@ -340,8 +340,8 @@
             width: 100%;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
-            top: 100%; /* Position below the button */
-            margin-top: 5px;
+            bottom: 100%; /* Position above the button */
+            margin-bottom: 5px;
         }
         .dropdown-content button {
             color: black;
@@ -1773,6 +1773,21 @@
             }
             return null;
         }
+
+        function generateStateSignature(state) {
+            const boardString = state.board.map(row => 
+                row.map(p => {
+                    if (!p) return ' ';
+                    let char = p.type;
+                    if(p.isJumpable) char += '*';
+                    return char;
+                }).join('')
+            ).join('/');
+            
+            const spellCooldowns = `${state.spells.white.jumpLastUsedTurn},${state.spells.white.freezeLastUsedTurn},${state.spells.black.jumpLastUsedTurn},${state.spells.black.freezeLastUsedTurn}`;
+
+            return `${boardString}|${state.currentPlayer}|${JSON.stringify(state.castlingRights)}|${JSON.stringify(state.enPassantTarget)}|${spellCooldowns}`;
+        }
         
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
@@ -2409,7 +2424,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = "Get Custom Game Link";
+                    getLinkButton.textContent = originalText;
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
