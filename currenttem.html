@@ -340,8 +340,8 @@
             width: 100%;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
-            bottom: 100%; /* Position above the button */
-            margin-bottom: 5px;
+            top: 100%; /* Position below the button */
+            margin-top: 5px; /* Add some space */
         }
         .dropdown-content button {
             color: black;
@@ -811,12 +811,6 @@
             const serializedState = JSON.stringify(stateToSave);
 
             const clonedDocument = document.cloneNode(true);
-
-            // Ensure dropdown is closed in the saved file
-            const clonedOptionsContent = clonedDocument.getElementById('options-content');
-            if (clonedOptionsContent) {
-                clonedOptionsContent.style.display = 'none';
-            }
             
             let existingSavedScriptInClone = clonedDocument.getElementById('savedGameStateData');
             if (existingSavedScriptInClone) {
@@ -1503,6 +1497,7 @@
         function generateMoveNotation(state, piece, fromR, fromC, toR, toC, capturedPiece, isEnPassant = false) {
             const pieceTypeUpper = piece.type.toUpperCase();
             
+            // For pawn moves, notation is simpler
             if (pieceTypeUpper === 'P') {
                 let notation = "";
                 if (capturedPiece) {
@@ -1517,34 +1512,35 @@
 
             let notation = pieceTypeUpper;
 
+            // Find other pieces of the same type that can also move to the target square
             const competitors = [];
-            if(pieceTypeUpper !== 'K') { // Kings don't need disambiguation
-                for (let r = 0; r < 8; r++) {
-                    for (let c = 0; c < 8; c++) {
-                        if (r === fromR && c === fromC) continue;
-                        const p = state.board[r][c];
-                        if (p && p.color === piece.color && p.type === piece.type) {
-                            if (isValidMove(r, c, toR, toC, state.board, state.currentPlayer, state.enPassantTarget, state.castlingRights, state.activeSpells, state.plyCount)) {
-                                competitors.push({r,c});
-                            }
-                        }
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (r === fromR && c === fromC) continue;
+                    const p = state.board[r][c];
+                    if (p && p.color === piece.color && p.type === piece.type) {
+                         if (isValidMove(r, c, toR, toC, state.board, state.currentPlayer, state.enPassantTarget, state.castlingRights, state.activeSpells, state.plyCount)) {
+                             competitors.push({r,c});
+                         }
                     }
                 }
             }
-            
+
+            // If there are competitors, add disambiguation
             if (competitors.length > 0) {
                 const fromFile = String.fromCharCode(97 + fromC);
                 const fromRank = (8 - fromR).toString();
 
-                const sameFileCompetitors = competitors.some(comp => comp.c === fromC);
-                const sameRankCompetitors = competitors.some(comp => comp.r === fromR);
+                const sameFileCompetitors = competitors.filter(comp => comp.c === fromC);
+                const sameRankCompetitors = competitors.filter(comp => comp.r === fromR);
                 
-                if (sameFileCompetitors && sameRankCompetitors) {
-                    notation += fromFile + fromRank; // Both file and rank are needed
-                } else if (sameFileCompetitors) {
-                    notation += fromRank;
+                if(sameFileCompetitors.length > 0 && sameRankCompetitors.length > 0) {
+                     notation += fromFile + fromRank; // Both file and rank are needed
+                }
+                else if (sameFileCompetitors.length > 0) {
+                    notation += fromRank; // Rooks on same file, use rank
                 } else {
-                    notation += fromFile;
+                    notation += fromFile; // Default to file
                 }
             }
             
@@ -1778,7 +1774,6 @@
             return null;
         }
 
-        
         function endTurn(moveNotation, movedPiece, fromR_param, toR_param, fromC_param, toC_param) {
             // If playing from a past move, truncate future history
             const isLatestMove = gameState.currentHistoryViewIndex === gameState.history.length - 1;
@@ -2414,7 +2409,7 @@
                 getLinkButton.textContent = 'Copied!';
                 updateStatus("Custom game link copied to clipboard!");
                 setTimeout(() => {
-                    getLinkButton.textContent = originalText;
+                    getLinkButton.textContent = "Get Custom Game Link";
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy link: ', err);
