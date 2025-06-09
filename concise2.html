@@ -1818,7 +1818,7 @@
             if(gameState.pendingSpellNotation) {
                 const [spellType, targetAlg] = gameState.pendingSpellNotation.split('@');
                 const coords = parseAlgebraicToCoords(targetAlg);
-                const spellChar = spellType.charAt(0);
+                const spellChar = spellType.charAt(0) === 'j' ? '.' : '~';
                 compactActions.push(spellChar + coordToB64(coords.r, coords.c));
             }
             let compactMove = coordToB64(fromR_param, fromC_param) + coordToB64(toR_param, toC_param);
@@ -2170,14 +2170,15 @@
             });
 
             if (gameData) {
+                resetGame(true); // Always start fresh when loading from URL
                 try {
-                    if (gameData.startsWith('v2:')) {
-                        const compactStringV2 = gameData.substring(3);
-                        resetGame(true);
-                        processImportFromCompactStringV2(compactStringV2);
-                    } else { // Handle old v1 format
+                    if (gameData.startsWith('v2:')) { // New, fixed v2 format
+                        processImportFromCompactStringV2(gameData.substring(3));
+                    } else if (gameData.includes(',')) { // Heuristic for old broken v2 format
+                        processImportFromBrokenV2(gameData);
+                    }
+                    else { // Original v1 format
                         const compactStringV1 = atob(decodeURIComponent(gameData));
-                        resetGame(true);
                         processImportFromCompactStringV1(compactStringV1);
                     }
                 } catch(e) {
@@ -2325,19 +2326,19 @@
 
             if(gameResultToken) {
                 gameState.isGameOver = true;
-                let player = gameState.currentPlayer;
+                const playerWhoseTurnItIs = gameState.currentPlayer;
                 let winner = "";
                 let message = "";
                 let notation = "";
 
                 switch(gameResultToken.toUpperCase()) {
                     case 'T': // Timeout
-                        winner = player === 'white' ? 'Black' : 'White'; // The player whose turn it is loses
+                        winner = playerWhoseTurnItIs === 'white' ? 'Black' : 'White'; // The player whose turn it is loses on time
                         message = `${winner} wins by timeout.`;
                         notation = "T";
                         break;
                     case 'R': // Resignation
-                        winner = player === 'white' ? 'White' : 'Black'; // The player whose turn it is wins (opponent resigned)
+                        winner = playerWhoseTurnItIs === 'white' ? 'White' : 'Black'; // The player whose turn it is wins (opponent resigned)
                         message = `${winner} wins by resignation.`;
                         notation = "R";
                         break;
@@ -2349,7 +2350,7 @@
                 gameState.gameEndMessage = message;
                  gameState.moveLog.push({ 
                     turn: gameState.gameTurnNumber, 
-                    player: player, 
+                    player: playerWhoseTurnItIs, 
                     notation: notation, 
                     actions: [], 
                     plySnapshotIndex: gameState.history.length
@@ -2439,7 +2440,6 @@
                 updateStatus("No moves to create a link from.");
                 return;
             }
-
             const compactString = gameState.moveLog.flatMap(log => log.actions).join('');
             const finalURL = `${baseURL}?game=v2:${compactString}`;
 
@@ -2498,16 +2498,45 @@
             updateStatus("Game loaded from URL successfully!");
         }
 
+        async function processImportFromBrokenV2(str) {
+            updateStatus("Importing game from URL (old v2)...");
+            let actions = str.split(',');
+            for (const action of actions) {
+                if (gameState.isGameOver) break;
+                if (action.includes('@')) {
+                    const [spellTypeStr, targetSquare] = action.split('@');
+                    const spellType = spellTypeStr === 'j' ? 'jump' : 'freeze';
+                    const coords = parseAlgebraicToCoords(targetSquare);
+                    if (!coords) throw new Error(`Invalid spell target in URL: ${action}`);
+                    activateSpellMode(spellType);
+                    handleSpellTargeting(coords.r, coords.c);
+                } else if(action.length > 1) {
+                     const moveCoords = findMoveFromSAN(action);
+                    if (!moveCoords) { /* Try to find a move matching the coords anyway */ }
+                    onSquareClick(moveCoords.fromR, moveCoords.fromC);
+                    onSquareClick(moveCoords.toR, moveCoords.toC);
+                    if (action.includes('=')) {
+                        const promotionPiece = action.slice(-1);
+                         if (gameState.awaitingPromotion) {
+                             const promotionButton = promotionChoicesDiv.querySelector(`[data-promote="${promotionPiece}"]`);
+                             if (promotionButton) promotionButton.click();
+                         }
+                    }
+                }
+                 await new Promise(resolve => setTimeout(resolve, 10));
+            }
+            updateStatus("Game loaded from URL successfully!");
+        }
+
         async function processImportFromCompactStringV2(str) {
-            updateStatus("Importing game from URL (v2)...");
+            updateStatus("Importing game from URL...");
             let i = 0;
             while (i < str.length) {
                 if (gameState.isGameOver) break;
 
                 const char1 = str[i];
-
-                if (char1 === 'j' || char1 === 'f') { // Spell
-                    const spellType = char1 === 'j' ? 'jump' : 'freeze';
+                if (char1 === '.' || char1 === '~') {
+                    const spellType = char1 === '.' ? 'jump' : 'freeze';
                     const targetChar = str[i + 1];
                     const coords = b64ToCoord(targetChar);
                     if (!coords) throw new Error(`Invalid spell target in URL: ${str.substring(i, i+2)}`);
@@ -2515,32 +2544,38 @@
                     activateSpellMode(spellType);
                     handleSpellTargeting(coords.r, coords.c);
                     i += 2;
-                } else { // Move
-                    const fromChar = str[i];
-                    const toChar = str[i + 1];
-                    const fromCoords = b64ToCoord(fromChar);
-                    const toCoords = b64ToCoord(toChar);
-                    if (!fromCoords || !toCoords) throw new Error(`Invalid move coordinates in URL: ${str.substring(i, i+2)}`);
-                    
-                    onSquareClick(fromCoords.r, fromCoords.c);
-                    onSquareClick(toCoords.r, toCoords.c);
+                }
+                
+                if (i >= str.length) break; 
 
-                    const promoChar = str[i + 2];
-                    if (promoChar && 'QRBN'.includes(promoChar)) { // Promotion
-                        if (gameState.awaitingPromotion) {
-                            const promoButton = promotionChoicesDiv.querySelector(`[data-promote="${promoChar}"]`);
-                            if (promoButton) {
-                                promoButton.click();
-                            } else {
-                                throw new Error(`Invalid promotion in URL: ${str.substring(i, i+3)}`);
-                            }
-                        }
-                        i += 3;
+                const fromChar = str[i];
+                const toChar = str[i + 1];
+                const fromCoords = b64ToCoord(fromChar);
+                const toCoords = b64ToCoord(toChar);
+                if (!fromCoords || !toCoords) throw new Error(`Invalid move coordinates in URL: ${str.substring(i, i+2)}`);
+                
+                onSquareClick(fromCoords.r, fromCoords.c);
+                
+                const promoChar = str[i + 2];
+                let promotionPiece = null;
+                if (promoChar && 'QRBN'.includes(promoChar)) {
+                     promotionPiece = promoChar;
+                     i += 3;
+                } else {
+                     i += 2;
+                }
+                
+                onSquareClick(toCoords.r, toCoords.c); 
+
+                if (promotionPiece && gameState.awaitingPromotion) {
+                    const promoButton = promotionChoicesDiv.querySelector(`[data-promote="${promotionPiece}"]`);
+                    if (promoButton) {
+                        promoButton.click();
                     } else {
-                        i += 2;
+                        throw new Error(`Invalid promotion in URL: ${str.substring(i-1, i)}`);
                     }
                 }
-                await new Promise(resolve => setTimeout(resolve, 10)); // Tiny delay
+                await new Promise(resolve => setTimeout(resolve, 10)); 
             }
             updateStatus("Game loaded from URL successfully!");
         }
