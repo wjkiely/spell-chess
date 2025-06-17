@@ -1459,8 +1459,11 @@
                     const colorMultiplier = (movingPiece.color === 'white') ? -1 : 1;
                     if (toR === fromR + colorMultiplier && toC === fromC && !targetPiece) {
                         isValidSpecificMove = true;
-                    } else if (toR === fromR + 2 * colorMultiplier && toC === fromC && !movingPiece.hasMoved && !targetPiece && !board[fromR + colorMultiplier][fromC]) {
-                        isValidSpecificMove = true;
+                    } else if (toR === fromR + 2 * colorMultiplier && toC === fromC && !movingPiece.hasMoved && !targetPiece) {
+                        const intermediateSquarePiece = board[fromR + colorMultiplier][fromC];
+                        if (!intermediateSquarePiece || intermediateSquarePiece.isJumpable) {
+                             isValidSpecificMove = true;
+                        }
                     } else if (toR === fromR + colorMultiplier && Math.abs(toC - fromC) === 1 && targetPiece && targetPiece.color !== movingPiece.color) {
                         isValidSpecificMove = true;
                     } else if (toR === fromR + colorMultiplier && Math.abs(toC - fromC) === 1 && !targetPiece &&
