@@ -231,9 +231,10 @@
             user-select: none;
             position: relative;
         }
-        .square.light { background-color: #f0d9b5; }
-        .square.dark { background-color: #b58863; }
-        .square.selected { background-color: #6a994e; }
+        /* Light mode default = Wood colors */
+        .square.light { background-color: #e8d0aa; }
+        .square.dark { background-color: #a67d5d; }
+        .square.selected { background-color: #c9a959; }
         .square.highlight-history {
             box-shadow: inset 0 0 10px 4px rgba(255, 0, 0, 0.6);
         }
@@ -242,8 +243,8 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(167, 201, 87, 0.5);
-            box-shadow: inset 0 0 0 2px #6a994e;
+            background-color: rgba(201, 169, 89, 0.5);
+            box-shadow: inset 0 0 0 2px #a68a3a;
             z-index: 1;
         }
         .square.active-freeze-zone {
@@ -686,6 +687,107 @@
         body.dark-theme .menu-item { border-bottom-color: #4a4a4a; }
         body.dark-theme .menu-separator { background-color: #555; }
 
+        /* --- BOARD COLOR SCHEMES --- */
+        /* Green scheme - forces green colors in light mode (matches dark theme default) */
+        body.board-scheme-green .square.light { background-color: #779556; }
+        body.board-scheme-green .square.dark { background-color: #597343; }
+        body.board-scheme-green .square.selected { background-color: #baca44; }
+        body.board-scheme-green .square.valid-move-hint::before {
+            background-color: rgba(186, 202, 68, 0.5);
+            box-shadow: inset 0 0 0 2px #a5b82e;
+        }
+
+        /* Wood scheme - forces wood colors in dark mode */
+        body.dark-theme.board-scheme-wood .square.light { background-color: #e8d0aa; }
+        body.dark-theme.board-scheme-wood .square.dark { background-color: #a67d5d; }
+        body.dark-theme.board-scheme-wood .square.selected { background-color: #c9a959; }
+        body.dark-theme.board-scheme-wood .square.valid-move-hint::before {
+            background-color: rgba(201, 169, 89, 0.5);
+            box-shadow: inset 0 0 0 2px #a68a3a;
+        }
+
+        /* Blue scheme */
+        body.board-scheme-blue .square.light { background-color: #dee3e6; }
+        body.board-scheme-blue .square.dark { background-color: #8ca2ad; }
+        body.board-scheme-blue .square.selected { background-color: #7fa650; }
+        body.board-scheme-blue .square.valid-move-hint::before {
+            background-color: rgba(127, 166, 80, 0.5);
+            box-shadow: inset 0 0 0 2px #5a8a32;
+        }
+        body.dark-theme.board-scheme-blue .square.light { background-color: #9dafbd; }
+        body.dark-theme.board-scheme-blue .square.dark { background-color: #5d7a8c; }
+        body.dark-theme.board-scheme-blue .square.selected { background-color: #8fbc3f; }
+
+        /* Purple scheme */
+        body.board-scheme-purple .square.light { background-color: #e6e0f0; }
+        body.board-scheme-purple .square.dark { background-color: #9583b8; }
+        body.board-scheme-purple .square.selected { background-color: #7b68c9; }
+        body.board-scheme-purple .square.valid-move-hint::before {
+            background-color: rgba(123, 104, 201, 0.5);
+            box-shadow: inset 0 0 0 2px #6352a8;
+        }
+        body.dark-theme.board-scheme-purple .square.light { background-color: #b8acd4; }
+        body.dark-theme.board-scheme-purple .square.dark { background-color: #6b5a8e; }
+        body.dark-theme.board-scheme-purple .square.selected { background-color: #8975d0; }
+
+        /* Color scheme menu item styles */
+        .color-scheme-submenu {
+            padding: 5px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .color-scheme-submenu-label {
+            font-size: 0.85em;
+            color: #666;
+            padding: 0 5px;
+            margin-bottom: 2px;
+        }
+        body.dark-theme .color-scheme-submenu-label {
+            color: #aaa;
+        }
+        .color-scheme-options {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .color-scheme-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            overflow: hidden;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .color-scheme-option:hover {
+            transform: scale(1.1);
+        }
+        .color-scheme-option.active {
+            border-color: #4CAF50;
+        }
+        body.dark-theme .color-scheme-option.active {
+            border-color: #81c784;
+        }
+        .color-scheme-option .scheme-preview-light,
+        .color-scheme-option .scheme-preview-dark {
+            width: 50%;
+            height: 100%;
+        }
+        /* Wood scheme preview - always shows wood colors */
+        .color-scheme-option[data-scheme="wood"] .scheme-preview-light { background-color: #e8d0aa; }
+        .color-scheme-option[data-scheme="wood"] .scheme-preview-dark { background-color: #a67d5d; }
+        /* Green scheme preview - always shows green colors */
+        .color-scheme-option[data-scheme="green"] .scheme-preview-light { background-color: #779556; }
+        .color-scheme-option[data-scheme="green"] .scheme-preview-dark { background-color: #597343; }
+        /* Blue scheme preview */
+        .color-scheme-option[data-scheme="blue"] .scheme-preview-light { background-color: #dee3e6; }
+        .color-scheme-option[data-scheme="blue"] .scheme-preview-dark { background-color: #8ca2ad; }
+        /* Purple scheme preview */
+        .color-scheme-option[data-scheme="purple"] .scheme-preview-light { background-color: #e6e0f0; }
+        .color-scheme-option[data-scheme="purple"] .scheme-preview-dark { background-color: #9583b8; }
+
     </style>
 </head>
 <body class="dark-theme game-view">
@@ -695,10 +797,22 @@
         (function() {
             // Dark theme is default. Remove it only if light theme is explicitly saved.
             const theme = localStorage.getItem('spellChessTheme');
-            if (theme === 'light') {
+            const isDark = theme !== 'light';
+            if (!isDark) {
                 document.body.classList.remove('dark-theme');
             } else {
-                 document.body.classList.add('dark-theme');
+                document.body.classList.add('dark-theme');
+            }
+            // Apply saved board color scheme
+            // Wood is default in light mode, green is default in dark mode
+            // Only apply class if it overrides the default
+            const colorScheme = localStorage.getItem('spellChessBoardScheme');
+            if (colorScheme === 'blue' || colorScheme === 'purple') {
+                document.body.classList.add('board-scheme-' + colorScheme);
+            } else if (colorScheme === 'green' && !isDark) {
+                document.body.classList.add('board-scheme-green');
+            } else if (colorScheme === 'wood' && isDark) {
+                document.body.classList.add('board-scheme-wood');
             }
         })();
     </script>
@@ -813,6 +927,28 @@
                         <div id="settings-menu" class="dropdown-menu">
                             <button id="toggle-theme-menu-item" class="menu-item"><span class="menu-item-icon">☀️</span><span class="menu-item-text">Switch to Light Theme</span></button>
                             <button id="toggle-pieces-menu-item" class="menu-item"><span class="menu-item-icon">🎨</span><span class="menu-item-text">Use Standard Pieces</span></button>
+                            <hr class="menu-separator">
+                            <div class="color-scheme-submenu">
+                                <span class="color-scheme-submenu-label">Board Colors</span>
+                                <div class="color-scheme-options">
+                                    <div class="color-scheme-option active" data-scheme="wood" title="Wood">
+                                        <div class="scheme-preview-light"></div>
+                                        <div class="scheme-preview-dark"></div>
+                                    </div>
+                                    <div class="color-scheme-option" data-scheme="green" title="Green">
+                                        <div class="scheme-preview-light"></div>
+                                        <div class="scheme-preview-dark"></div>
+                                    </div>
+                                    <div class="color-scheme-option" data-scheme="blue" title="Blue">
+                                        <div class="scheme-preview-light"></div>
+                                        <div class="scheme-preview-dark"></div>
+                                    </div>
+                                    <div class="color-scheme-option" data-scheme="purple" title="Purple">
+                                        <div class="scheme-preview-light"></div>
+                                        <div class="scheme-preview-dark"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2775,12 +2911,89 @@
                 }
             }
 
+            // BOARD COLOR SCHEME LOGIC
+            const colorSchemeOptions = document.querySelectorAll('.color-scheme-option');
+
+            function getCurrentScheme() {
+                // Determine current scheme based on classes and theme
+                const isDark = document.body.classList.contains('dark-theme');
+                if (document.body.classList.contains('board-scheme-blue')) return 'blue';
+                if (document.body.classList.contains('board-scheme-purple')) return 'purple';
+                if (document.body.classList.contains('board-scheme-green')) return 'green';
+                if (document.body.classList.contains('board-scheme-wood')) return 'wood';
+                // Default: wood in light mode, green in dark mode
+                return isDark ? 'green' : 'wood';
+            }
+
+            function applyColorScheme(scheme, save = true) {
+                const isDark = document.body.classList.contains('dark-theme');
+                // Remove all scheme classes
+                document.body.classList.remove('board-scheme-blue', 'board-scheme-wood', 'board-scheme-purple', 'board-scheme-green');
+
+                // Apply class only if it overrides the default
+                if (scheme === 'blue' || scheme === 'purple') {
+                    document.body.classList.add('board-scheme-' + scheme);
+                } else if (scheme === 'green' && !isDark) {
+                    // Green in light mode needs class (default is wood)
+                    document.body.classList.add('board-scheme-green');
+                } else if (scheme === 'wood' && isDark) {
+                    // Wood in dark mode needs class (default is green)
+                    document.body.classList.add('board-scheme-wood');
+                }
+                // Wood in light mode and green in dark mode don't need classes (they're defaults)
+
+                // Update active state on buttons
+                colorSchemeOptions.forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.scheme === scheme);
+                });
+                // Save preference
+                if (save) {
+                    localStorage.setItem('spellChessBoardScheme', scheme);
+                }
+            }
+
+            function updateColorSchemeActiveState() {
+                const currentScheme = getCurrentScheme();
+                colorSchemeOptions.forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.scheme === currentScheme);
+                });
+            }
+
+            // Initialize color scheme buttons
+            colorSchemeOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    applyColorScheme(opt.dataset.scheme);
+                });
+            });
+            updateColorSchemeActiveState();
+
+            // Theme toggle with wood/green pairing
             toggleThemeMenuItem.addEventListener('click', () => {
+                const currentScheme = getCurrentScheme();
+                const wasWood = currentScheme === 'wood';
+                const wasGreen = currentScheme === 'green';
+
                 document.body.classList.toggle('dark-theme');
-                if (document.body.classList.contains('dark-theme')) {
+                const isDark = document.body.classList.contains('dark-theme');
+
+                if (isDark) {
                     localStorage.setItem('spellChessTheme', 'dark');
+                    // If was wood (light default), switch to green (dark default)
+                    if (wasWood) {
+                        applyColorScheme('green');
+                    } else {
+                        // Re-apply current scheme for the new theme
+                        applyColorScheme(currentScheme, false);
+                    }
                 } else {
                     localStorage.setItem('spellChessTheme', 'light');
+                    // If was green (dark default), switch to wood (light default)
+                    if (wasGreen) {
+                        applyColorScheme('wood');
+                    } else {
+                        // Re-apply current scheme for the new theme
+                        applyColorScheme(currentScheme, false);
+                    }
                 }
                 updateThemeButton();
             });
