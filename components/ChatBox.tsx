@@ -99,7 +99,8 @@ export default function ChatBox({ gameId, playerColor, theme }: Props) {
     if (!content) return;
     setSending(true);
     const supabase = getSupabaseClient();
-    await supabase.from("messages" as never).insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from("messages" as never) as any).insert({
       game_id: gameId,
       color: playerColor,
       name: name.trim() || null,
